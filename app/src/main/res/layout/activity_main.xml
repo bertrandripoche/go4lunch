@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_activity_coordinator_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_portrait"
+    tools:context="com.openclassrooms.go4lunch.MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        >
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/logo_g4l"
+            android:layout_marginTop="80dp"
+            android:elevation="2dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_name"
+            android:textSize="@dimen/max_title_size"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:elevation="2dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/main_activity_description"
+            android:textAlignment="center"
+            android:gravity="top"
+            android:textSize="@dimen/default_text_size_small"
+            android:textColor="@color/white"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="bottom"
+            android:orientation="vertical"
+            android:layout_margin="@dimen/default_large_margin">
+
+            <Button
+                android:id="@+id/main_activity_button_login_facebook"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/sign_in_facebook"
+                android:textColor="@color/white"
+                android:textSize="@dimen/default_text_size"
+                android:textAllCaps="false"
+                android:background="@drawable/button_radius_facebook"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_margin="@dimen/default_large_margin"
+                android:padding="@dimen/default_large_margin"
+                android:elevation="2dp"
+                android:drawableStart="@drawable/ic_facebook"/>
+
+            <Button
+                android:id="@+id/main_activity_button_login_google"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/sign_in_google"
+                android:textColor="@color/white"
+                android:textSize="@dimen/default_text_size"
+                android:textAllCaps="false"
+                android:background="@drawable/button_radius_google"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_margin="@dimen/default_large_margin"
+                android:padding="@dimen/default_large_margin"
+                android:elevation="2dp"
+                android:drawableStart="@drawable/ic_google" />
+
+        </LinearLayout>
+    </LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
