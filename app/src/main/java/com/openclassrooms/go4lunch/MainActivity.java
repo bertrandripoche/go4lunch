@@ -6,7 +6,6 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 
 import com.firebase.ui.auth.AuthUI;
@@ -71,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startMapActivity() {
-        Intent intent = new Intent(MainActivity.this, MapActivity.class);
+        Intent intent = new Intent(MainActivity.this, PrincipalActivity.class);
         startActivity(intent);
     }
 

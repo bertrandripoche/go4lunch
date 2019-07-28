@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+        <string name="app_name">Go4Lunch</string>
+        <string name="main_activity_description">Trouvez un bon resto et invitez vos collègues pour le déjeuner !</string>
+        <string name="sign_in_facebook">Connexion avec Facebook</string>
+        <string name="sign_in_google">Connexion avec Google</string>
+        <string name="google">google</string>
+        <string name="facebook">facebook</string>
+        <string name="connection_succeed">Connexion réussie</string>
+        <string name="error_authentication_canceled">Connexion annulée</string>
+        <string name="error_no_internet">Connexion refusée. Pas de réseau.</string>
+        <string name="error_unknown_error">Connexion refusée. Erreur inconnue.</string>
+        <string name="error_undefined_error">Connexion refusée. Erreur indéfinie.</string>
+
+        <string name="facebook_app_id">341176393440517</string>
+        <string name="facebook_application_id" tools:ignore="DuplicateDefinition">341176393440517</string>
+        <string name="fb_login_protocol_scheme">fb341176393440517</string>
+
+        <string name="title_workmates">Collègues</string>
+        <string name="title_list_view">Vue Liste</string>
+        <string name="title_map_view">Vue Carte</string>
+        <string name="logout_google">Déconnexion</string>
+        <string name="title_activity_maps">Carte</string>
+
+        <!-- TODO: Remove or change this placeholder text -->
+        <string name="search">Recherche</string>
+        <string name="toolbar_title_map">J\'ai faim !</string>
+        <string name="toolbar_title_list">J\'ai faim !</string>
+        <string name="toolbar_title_workmates">Collègues disponibles</string>
+        <string name="your_lunch">Votre déjeuner</string>
+        <string name="settings">Préférences</string>
+        <string name="logout">Déconnexion</string>
+        <string name="navigation_drawer_open">Ouvrir menu</string>
+        <string name="navigation_drawer_close">Fermer menu</string>
+        <string name="you_are_here">Vous êtes ici !</string>
+        <string name="default_paris">Paris !</string>
+
+</resources>
