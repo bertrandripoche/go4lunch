@@ -8,5 +8,5 @@
     <dimen name="default_text_size_small">10sp</dimen>
     <dimen name="default_text_size_mini">8sp</dimen>
 
-    <dimen name="nav_header_height">200dp</dimen>
+    <dimen name="nav_header_height">240dp</dimen>
 </resources>

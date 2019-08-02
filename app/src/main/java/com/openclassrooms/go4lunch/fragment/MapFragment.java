@@ -1,6 +1,5 @@
 package com.openclassrooms.go4lunch.fragment;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -21,7 +20,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -31,15 +32,25 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.PlaceLikelihood;
+import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
+import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
+import com.google.android.libraries.places.api.net.PlacesClient;
 import com.openclassrooms.go4lunch.R;
 
-import static com.firebase.ui.auth.AuthUI.getApplicationContext;
+import java.util.Arrays;
+import java.util.List;
 
-public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener {
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+
+public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnCameraIdleListener {
 
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private static final String TAG = "Map Fragment";
@@ -51,9 +62,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private Location mLastKnownLocation;
     private LatLng mLatLngLastKnownLocation;
 
-    private final LatLng mDefaultLocation = new LatLng(48.864716, 2.349014);
-    private static final int DEFAULT_ZOOM = 15;
+    private PlacesClient mPlacesClient;
 
+    private String[] mLikelyPlaceNames;
+    private String[] mLikelyPlaceAddresses;
+    private LatLng[] mLikelyPlaceLatLngs;
+
+    private final LatLng mDefaultLocation = new LatLng(48.864716, 2.349014);
+    private static final int DEFAULT_ZOOM = 18;
 
     public MapFragment() {
         // Required empty public constructor
@@ -69,6 +85,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Places.initialize(getContext(), getString(R.string.google_maps_key));
+        mPlacesClient = Places.createClient(getContext());
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
     }
@@ -95,6 +113,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+        boolean success = googleMap.setMapStyle(new MapStyleOptions(getResources().getString(R.string.style_json)));
+
+        if (!success) {
+            Log.e(TAG, "Style parsing failed.");
+        }
+
         updateLocationUI();
         getDeviceLocation();
 
@@ -103,30 +127,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
         View mapView = mMapFragment.getView();
         moveCompassButton(mapView);
-    }
 
-    private void moveCompassButton(View mapView) {
-        try {
-            assert mapView != null; // skip this if the mapView has not been set yet
-            View view = mapView.findViewWithTag("GoogleMapMyLocationButton");
-
-            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-
-            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_END, RelativeLayout.TRUE);
-            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-            layoutParams.setMargins(0, 0, 20, 20);
-
-            view.setLayoutParams(layoutParams);
-            view.setBackgroundColor(getResources().getColor(R.color.white));
-        } catch (Exception ex) {
-            Log.e(TAG, "moveCompassButton() - failed: " + ex.getLocalizedMessage());
-            ex.printStackTrace();
-        }
     }
 
     @Override
     public boolean onMyLocationButtonClick() {
-        System.out.println("Bouton cliqué");
+        getRestaurants();
         return false;
     }
 
@@ -147,23 +153,50 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         updateLocationUI();
     }
 
+    @Override
+    public void onCameraIdle() {
+        Toast.makeText(getActivity(), "The camera is moving.", Toast.LENGTH_SHORT).show();
+
+        double mylat = mMap.getCameraPosition().target.latitude;
+        double mylon = mMap.getCameraPosition().target.longitude;
+    }
+
+    private void moveCompassButton(View mapView) {
+        try {
+            assert mapView != null; // skip this if the mapView has not been set yet
+            View view = mapView.findViewWithTag("GoogleMapMyLocationButton");
+
+            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+
+            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_END, RelativeLayout.TRUE);
+            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+            layoutParams.setMargins(0, 0, 20, 20);
+
+            view.setLayoutParams(layoutParams);
+            view.setBackgroundColor(getResources().getColor(R.color.white));
+        } catch (Exception ex) {
+            Log.e(TAG, "MoveCompassButton() - failed: " + ex.getLocalizedMessage());
+            ex.printStackTrace();
+        }
+    }
+
     private void getLocationPermission() {
         if (ContextCompat.checkSelfPermission(getActivity().getApplicationContext(),
-                android.Manifest.permission.ACCESS_FINE_LOCATION)
+                ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mLocationPermissionGranted = true;
         } else {
             ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    new String[]{ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
     }
 
     private void enableMyLocation() {
-        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+        if (ContextCompat.checkSelfPermission(getContext(), ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    new String[]{ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         } else if (mMap != null) {
             // Access to the location has been granted to the app.
@@ -203,15 +236,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                             // Set the map's camera position to the current location of the device.
                             mLastKnownLocation = task.getResult();
                             mLatLngLastKnownLocation =  new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
-                            //mMap.addMarker(new MarkerOptions().position(mLatLngLastKnownLocation).title(getString(R.string.you_are_here)).icon(bitmapDescriptorFromVector(getContext(),R.drawable.ic_thats_me)));
                             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mLatLngLastKnownLocation, DEFAULT_ZOOM));
+
+                            getRestaurants();
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());
                             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
                             mMap.getUiSettings().setMyLocationButtonEnabled(false);
-                            //mMap.addMarker(new MarkerOptions().position(mDefaultLocation).title(getString(R.string.default_paris)));
                         }
+
                     }
                 });
             }
@@ -227,5 +261,73 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         Canvas canvas = new Canvas(bitmap);
         vectorDrawable.draw(canvas);
         return BitmapDescriptorFactory.fromBitmap(bitmap);
+    }
+
+    private void getRestaurants() {
+        // Use fields to define the data types to return.
+        List<Place.Field> placeFields = Arrays.asList(Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG, Place.Field.TYPES, Place.Field.ID);
+
+        final FindCurrentPlaceRequest request = FindCurrentPlaceRequest.builder(placeFields).build();
+
+        if (ContextCompat.checkSelfPermission(getContext(), ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
+            Task<FindCurrentPlaceResponse> placeResponse = mPlacesClient.findCurrentPlace(request);
+            placeResponse.addOnCompleteListener(getActivity(),
+                new OnCompleteListener<FindCurrentPlaceResponse>() {
+                    @Override
+                    public void onComplete(@NonNull Task<FindCurrentPlaceResponse> task) {
+                        if (task.isSuccessful()) {
+                            FindCurrentPlaceResponse response = task.getResult();
+                            // Set the count, handling cases where less than 5 entries are returned.
+                            int count;
+                            System.out.println("TAILLE : "+response.getPlaceLikelihoods().size());
+                            if (response.getPlaceLikelihoods().size() < 100) {
+                                count = response.getPlaceLikelihoods().size();
+                            } else {
+                                count = 100;
+                            }
+
+                            int i = 0;
+                            mLikelyPlaceNames = new String[count];
+                            mLikelyPlaceAddresses = new String[count];
+                            mLikelyPlaceLatLngs = new LatLng[count];
+
+                            for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
+                                Place currPlace = placeLikelihood.getPlace();
+
+                                if (currPlace.getTypes().contains(Place.Type.RESTAURANT)) {
+                                    mLikelyPlaceNames[i] = currPlace.getName();
+                                    mLikelyPlaceAddresses[i] = currPlace.getAddress();
+                                    mLikelyPlaceLatLngs[i] = currPlace.getLatLng();
+                                    System.out.println("Id du resto : "+currPlace.getId());
+
+                                    String currLatLng = (mLikelyPlaceLatLngs[i] == null) ?
+                                            "" : mLikelyPlaceLatLngs[i].toString();
+
+                                    Log.i(TAG, String.format("Place " + currPlace.getName()
+                                            + " has likelihood: " + placeLikelihood.getLikelihood()
+                                            + " at " + currLatLng));
+
+                                    mMap.addMarker(new MarkerOptions().position(new LatLng(mLikelyPlaceLatLngs[i].latitude, mLikelyPlaceLatLngs[i].longitude)).title(mLikelyPlaceNames[i]).icon(bitmapDescriptorFromVector(getContext(), R.drawable.ic_markers_restaurant_red)));
+                                }
+
+                                i++;
+                                if (i > (count - 1)) {
+                                    break;
+                                }
+                            }
+
+                        } else {
+                            Exception exception = task.getException();
+                            if (exception instanceof ApiException) {
+                                ApiException apiException = (ApiException) exception;
+                                Log.e(TAG, "Place not found: " + apiException.getStatusCode());
+                            }
+                        }
+                    }
+                });
+        } else {
+            getLocationPermission();
+        }
     }
 }

@@ -1,4 +1,4 @@
-package com.openclassrooms.go4lunch;
+package com.openclassrooms.go4lunch.activity;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,6 +15,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.openclassrooms.go4lunch.R;
 
 import java.util.Arrays;
 
@@ -36,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (isCurrentUserLogged()) {
-            startMapActivity();
+            startPrincipalActivity();
         } else {
             setContentView(R.layout.activity_main);
             ButterKnife.bind(this);
@@ -53,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
     public void onClickGoogleLoginButton() {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         if (auth.getCurrentUser() != null) {
-            startMapActivity();
+            startPrincipalActivity();
         } else {
             this.startSignInActivity("google");
         }
@@ -63,13 +64,13 @@ public class MainActivity extends AppCompatActivity {
     public void onClickFacebookLoginButton() {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         if (auth.getCurrentUser() != null) {
-            startMapActivity();
+            startPrincipalActivity();
         } else {
             this.startSignInActivity("facebook");
         }
     }
 
-    private void startMapActivity() {
+    private void startPrincipalActivity() {
         Intent intent = new Intent(MainActivity.this, PrincipalActivity.class);
         startActivity(intent);
     }
@@ -106,8 +107,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) {
-                showSnackBar(this.coordinatorLayout, getString(R.string.connection_succeed));
-                startMapActivity();
+                startPrincipalActivity();
             } else {
                 if (response == null) {
                     showSnackBar(this.coordinatorLayout, getString(R.string.error_authentication_canceled));
@@ -119,14 +119,6 @@ public class MainActivity extends AppCompatActivity {
                     showSnackBar(this.coordinatorLayout, getString(R.string.error_undefined_error));
                 }
             }
-        }
-    }
-
-    private void deleteUserFromFirebase(){
-        if (this.getCurrentUser() != null) {
-            AuthUI.getInstance()
-                    .delete(this)
-                    .addOnSuccessListener(this, this.updateUIAfterRESTRequestsCompleted(DELETE_USER_TASK));
         }
     }
 

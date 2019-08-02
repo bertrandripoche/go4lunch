@@ -1,19 +1,41 @@
-package com.openclassrooms.go4lunch;
+package com.openclassrooms.go4lunch.utils;
 
 import android.app.Activity;
 import android.content.Context;
 
+import androidx.annotation.Nullable;
+
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class FirebaseUserManagement {
     private static final int SIGN_OUT_TASK = 10;
     private static final int DELETE_USER_TASK = 20;
 
+    private static FirebaseAuth mAuth;
+
+    public FirebaseUserManagement() {
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    }
+
     public void signOutUserFromFirebase(Activity activity){
         AuthUI.getInstance()
                 .signOut(activity)
                 .addOnSuccessListener(activity, this.updateUIAfterRESTRequestsCompleted(SIGN_OUT_TASK, activity));
+    }
+
+    @Nullable
+    public static FirebaseUser getCurrentUser(){
+        return FirebaseAuth.getInstance().getCurrentUser(); }
+
+    private void deleteUserFromFirebase(Context context, Activity activity){
+        if (this.getCurrentUser() != null) {
+            AuthUI.getInstance()
+                    .delete(context)
+                    .addOnSuccessListener(activity, this.updateUIAfterRESTRequestsCompleted(DELETE_USER_TASK,activity));
+        }
     }
 
     private OnSuccessListener<Void> updateUIAfterRESTRequestsCompleted(final int origin, Activity activity){
@@ -22,11 +44,9 @@ public class FirebaseUserManagement {
             public void onSuccess(Void aVoid) {
                 switch (origin){
                     case SIGN_OUT_TASK:
-                        System.out.println("DECONNEXION");
                         activity.finish();
                         break;
                     case DELETE_USER_TASK:
-
                         activity.finish();
                         break;
                     default:

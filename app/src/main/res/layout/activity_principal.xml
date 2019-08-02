@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     tools:openDrawer="start"
-    tools:context="com.openclassrooms.go4lunch.PrincipalActivity"
+    tools:context="com.openclassrooms.go4lunch.activity.PrincipalActivity"
     >
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -40,6 +40,17 @@
         app:itemTextColor="@color/white"
         app:itemIconTint="@color/white"
         app:headerLayout="@layout/activity_principal_nav_drawer"
-        app:menu="@menu/nav_drawer" />
+        app:menu="@menu/nav_drawer" >
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/logo_g4l"
+                android:layout_gravity="bottom|center"
+                android:layout_marginBottom="20dp"/>
+
+        </com.google.android.material.navigation.NavigationView>
+
+
 
 </androidx.drawerlayout.widget.DrawerLayout>

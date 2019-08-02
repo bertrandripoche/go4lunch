@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.openclassrooms.go4lunch">
+    package="com.openclassrooms.go4lunch"
+    android:installLocation="preferExternal">
 
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
@@ -31,7 +32,7 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -61,12 +62,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".PrincipalActivity"
-            android:label="Map"
-            android:parentActivityName=".MainActivity">
+            android:name=".activity.PrincipalActivity"
+            android:label="@string/toolbar_title_map"
+            android:parentActivityName=".activity.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value=".activity.MainActivity" />
         </activity>
     </application>
 

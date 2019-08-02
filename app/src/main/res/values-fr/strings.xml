@@ -36,4 +36,11 @@
         <string name="you_are_here">Vous êtes ici !</string>
         <string name="default_paris">Paris !</string>
 
+        <string name="title_web">WEB</string>
+        <string name="title_like">J\'AIME</string>
+        <string name="title_call">APPELER</string>
+
+        <string name="undefined_mail">Mail indéfini</string>
+        <string name="undefined_name">Nom indéfini</string>
+
 </resources>
