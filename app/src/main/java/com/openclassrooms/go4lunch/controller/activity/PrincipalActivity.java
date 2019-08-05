@@ -1,4 +1,4 @@
-package com.openclassrooms.go4lunch.activity;
+package com.openclassrooms.go4lunch.controller.activity;
 
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,16 +19,15 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseUser;
 import com.openclassrooms.go4lunch.R;
-import com.openclassrooms.go4lunch.fragment.ListFragment;
-import com.openclassrooms.go4lunch.fragment.MapFragment;
-import com.openclassrooms.go4lunch.fragment.WorkmatesFragment;
+import com.openclassrooms.go4lunch.controller.fragment.ListFragment;
+import com.openclassrooms.go4lunch.controller.fragment.MapFragment;
+import com.openclassrooms.go4lunch.controller.fragment.WorkmatesFragment;
 import com.openclassrooms.go4lunch.utils.FirebaseUserManagement;
-
-import butterknife.ButterKnife;
 
 public class PrincipalActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -155,4 +154,5 @@ public class PrincipalActivity extends AppCompatActivity implements NavigationVi
                 .into(userPic);
 
     }
+
 }

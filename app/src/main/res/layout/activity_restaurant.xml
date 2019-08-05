@@ -4,6 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     android:layout_margin="0dp">
 
     <LinearLayout
@@ -12,10 +13,12 @@
         android:orientation="vertical">
 
         <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/resto_activity_bg"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/bg_resto"/>
+            android:id="@+id/restaurant_activity_pic"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:maxHeight="200dp"
+            android:minHeight="200dp"
+            />
 
         <LinearLayout
             android:id="@+id/resto_description"
@@ -24,9 +27,9 @@
             android:orientation="horizontal"
             android:background="@color/orange">
             <TextView
+                android:id="@+id/restaurant_activity_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Nom du resto"
                 android:textSize="20sp"
                 android:textColor="@color/white"
                 android:paddingEnd="10dp"
@@ -34,97 +37,67 @@
                 android:paddingTop="10dp"
                 />
             <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/restaurant_activity_stars"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_star_2"
                 android:baselineAlignBottom="true"/>
 
         </LinearLayout>
 
         <TextView
+            android:id="@+id/restaurant_activity_address"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textSize="14sp"
             android:textColor="@color/white"
             android:background="@color/orange"
-            android:text="12 Rue du Faubourg Saint-Denis"
             android:paddingEnd="15dp"
             android:paddingStart="10dp"
-            android:paddingBottom="10dp"/>
+            android:paddingBottom="20dp"
+            />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp">
 
-            <LinearLayout
+            <Button
+                android:id="@+id/btnCall"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:layout_weight="1"
-                android:orientation="vertical"
-                android:layout_margin="15dp"
-                android:layout_gravity="center"
-                android:gravity="center">
-                <androidx.appcompat.widget.AppCompatImageButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_call"
-                    android:background="@color/white"
-                    android:layout_marginBottom="10dp"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/title_call"
-                    android:textColor="@color/orange"
-                    android:textSize="15sp"
-                    />
-            </LinearLayout>
+                android:background="@color/white"
+                android:drawableTop="@drawable/ic_call"
+                android:gravity="center"
+                android:text="@string/title_call"
+                android:textColor="@color/orange"
+                android:textSize="15sp" />
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:layout_margin="15dp"
-                android:layout_gravity="center"
-                android:gravity="center">
-                <androidx.appcompat.widget.AppCompatImageButton
+                <Button
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_star"
-                    android:background="@color/white"
-                    android:layout_marginBottom="10dp"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:id="@+id/btnLike"
                     android:text="@string/title_like"
-                    android:textColor="@color/orange"
                     android:textSize="15sp"
-                    />
-            </LinearLayout>
+                    android:textColor="@color/orange"
+                    android:gravity="center"
+                    android:drawableTop="@drawable/ic_star"
+                    android:background="@color/white"/>
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:layout_margin="15dp"
-                android:layout_gravity="center"
-                android:gravity="center">
-                <androidx.appcompat.widget.AppCompatImageButton
+                <Button
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_web"
-                    android:background="@color/white"
-                    android:layout_marginBottom="10dp"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:id="@+id/btnWeb"
                     android:text="@string/title_web"
-                    android:textColor="@color/orange"
-                    android:textColorHint="@color/black"
                     android:textSize="15sp"
-                    />
-            </LinearLayout>
+                    android:textColor="@color/orange"
+                    android:gravity="center"
+                    android:drawableTop="@drawable/ic_web"
+                    android:background="@color/white"/>
 
         </LinearLayout>
 
@@ -139,7 +112,7 @@
         android:layout_height="wrap_content"
         android:backgroundTint="@color/white"
         android:src="@drawable/ic_my_choice"
-        app:layout_anchor="@id/resto_activity_bg"
+        app:layout_anchor="@id/restaurant_activity_pic"
         app:layout_anchorGravity="bottom|right|end"
         android:elevation="6dp"
         android:layout_margin="16dp"

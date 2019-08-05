@@ -11,6 +11,8 @@
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+
 
     <application
         android:allowBackup="true"
@@ -32,7 +34,7 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity android:name=".activity.MainActivity">
+        <activity android:name=".controller.activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -62,12 +64,27 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.PrincipalActivity"
+            android:name=".controller.activity.PrincipalActivity"
             android:label="@string/toolbar_title_map"
-            android:parentActivityName=".activity.MainActivity">
+            android:parentActivityName=".controller.activity.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.MainActivity" />
+                android:value=".controller.activity.MainActivity" />
+        </activity>
+        <activity
+            android:name=".controller.activity.RestaurantActivity"
+            android:label="@string/toolbar_title_map"
+            android:parentActivityName=".controller.activity.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".controller.activity.MainActivity" />
+        </activity>
+        <activity
+            android:name=".controller.activity.RestaurantWebPageActivity"
+            android:parentActivityName=".controller.activity.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".controller.activity.MainActivity" />
         </activity>
     </application>
 

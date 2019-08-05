@@ -1,4 +1,4 @@
-package com.openclassrooms.go4lunch.activity;
+package com.openclassrooms.go4lunch.controller.activity;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;

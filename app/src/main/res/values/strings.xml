@@ -13,7 +13,7 @@
 
     <string name="facebook_app_id">341176393440517</string>
     <string name="facebook_application_id" tools:ignore="DuplicateDefinition">341176393440517</string>
-    <string name="fb_login_protocol_scheme">fb341176393440517</string>
+    <string name="fb_login_protocol_scheme" translatable="false">fb341176393440517</string>
 
     <string name="title_workmates">Workmates</string>
     <string name="title_list_view">List View</string>
@@ -40,5 +40,8 @@
 
     <string name="undefined_mail">Undefined mail</string>
     <string name="undefined_name">Undefined name</string>
+    <string name="restaurant_address">Restaurant address</string>
+    <string name="restaurant_name">Restaurant name</string>
+    <string name="no_phone_available">No phone available</string>
 
 </resources>

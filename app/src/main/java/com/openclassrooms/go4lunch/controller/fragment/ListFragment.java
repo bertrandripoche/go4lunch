@@ -1,4 +1,4 @@
-package com.openclassrooms.go4lunch.fragment;
+package com.openclassrooms.go4lunch.controller.fragment;
 
 import android.app.Activity;
 import android.os.Bundle;

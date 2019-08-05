@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     tools:openDrawer="start"
-    tools:context="com.openclassrooms.go4lunch.activity.PrincipalActivity"
+    tools:context=".controller.activity.PrincipalActivity"
     >
 
     <androidx.constraintlayout.widget.ConstraintLayout
