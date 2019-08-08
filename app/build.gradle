@@ -33,14 +33,22 @@ dependencies {
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
+    implementation 'com.android.support:multidex:1.0.3'
+
     //FIREBASE
-    implementation 'com.google.firebase:firebase-core:17.0.1'
+    implementation 'com.google.firebase:firebase-core:17.0.0'
     implementation 'com.google.firebase:firebase-auth:18.1.0'
+
+
+    //FIRESTORE
+    implementation 'com.firebaseui:firebase-ui-storage:5.0.0'
     implementation 'com.firebaseui:firebase-ui-auth:5.0.0'
+    implementation 'com.firebaseui:firebase-ui-firestore:5.0.0'
 
     //GOOGLE
     implementation 'com.google.android.gms:play-services-auth:17.0.0'
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
+    implementation 'com.google.android.gms:play-services-location:17.0.0'
     implementation 'com.google.android.libraries.places:places:2.0.0'
 
     //GLIDE
@@ -55,7 +63,7 @@ dependencies {
     implementation 'com.facebook.android:facebook-login:4.42.0'
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'com.facebook.android:facebook-android-sdk:[5,6)'
-    implementation 'com.google.android.gms:play-services-location:17.0.0'
+
 }
 
 apply plugin: 'com.google.gms.google-services'

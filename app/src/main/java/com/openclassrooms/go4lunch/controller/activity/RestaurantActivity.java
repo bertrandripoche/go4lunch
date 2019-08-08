@@ -1,10 +1,7 @@
 package com.openclassrooms.go4lunch.controller.activity;
 
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,10 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.libraries.places.api.Places;
@@ -26,26 +20,28 @@ import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.FetchPhotoRequest;
 import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.openclassrooms.go4lunch.R;
-import com.openclassrooms.go4lunch.model.Restaurant;
+import com.openclassrooms.go4lunch.api.EmployeeHelper;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static android.Manifest.permission.CALL_PHONE;
-
-public class RestaurantActivity extends AppCompatActivity implements View.OnClickListener {
+public class RestaurantActivity extends BaseActivity implements View.OnClickListener {
     private static final String TAG = "Restaurant Log - ";
     private Bundle mExtras;
     private String mPlaceId;
     private PlacesClient mPlacesClient;
     private Place mPlace;
-    private Restaurant mRestaurant;
     private Button mBtnCall;
     private Button mBtnLike;
     private Button mBtnWeb;
+    private FloatingActionButton mBtnLunch;
 
     final String PLACE_ID = "placeId";
+    private static boolean mLikeOn;
+    private boolean mLunchOn;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -55,10 +51,12 @@ public class RestaurantActivity extends AppCompatActivity implements View.OnClic
         mBtnCall=(Button)findViewById(R.id.btnCall);
         mBtnLike=(Button)findViewById(R.id.btnLike);
         mBtnWeb=(Button)findViewById(R.id.btnWeb);
+        mBtnLunch=(FloatingActionButton)findViewById(R.id.mBtnLunch);
 
         mBtnCall.setOnClickListener(this);
         mBtnLike.setOnClickListener(this);
         mBtnWeb.setOnClickListener(this);
+        mBtnLunch.setOnClickListener(this);
 
         mExtras = getBundle();
         mPlaceId = getPlaceIdFromBundle();
@@ -74,17 +72,12 @@ public class RestaurantActivity extends AppCompatActivity implements View.OnClic
     public void onClick(View v) {
 
         if (v.equals(mBtnCall)) {
-            if (mRestaurant.getPhone() != null) {
-                String phoneNumber = mRestaurant.getPhone();
+            if (mPlace.getPhoneNumber() != null) {
+                String phoneNumber = mPlace.getPhoneNumber();
 
-                Intent callIntent = new Intent(Intent.ACTION_CALL);
+                Intent callIntent = new Intent(Intent.ACTION_DIAL);
                 callIntent.setData(Uri.parse("tel:"+phoneNumber));
-
-                if (ContextCompat.checkSelfPermission(getApplicationContext(), CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
-                    startActivity(callIntent);
-                } else {
-                    ActivityCompat.requestPermissions(this, new String[]{CALL_PHONE}, 1);
-                }
+                startActivity(callIntent);
 
             } else {
                 System.out.println("Pas de téléphone");
@@ -92,21 +85,46 @@ public class RestaurantActivity extends AppCompatActivity implements View.OnClic
             }
 
         }
-        else if (v.equals(mBtnLike)) {
-            // DO SOMETHING NICE
+        if (v.equals(mBtnLike)) {
+
+            if (mLikeOn == true) {
+                mBtnLike.setTextColor(getResources().getColor(R.color.orange));
+                mBtnLike.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_star, 0, 0);
+                mLikeOn = false;
+            } else {
+                this.addLikedRestaurantForEmployeeInFirestore();
+                mBtnLike.setTextColor(getResources().getColor(R.color.yellow));
+                mBtnLike.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_star_1, 0, 0);
+                mLikeOn = true;
+            }
+
 
         }
         if (v.equals(mBtnWeb)) {
             final String RESTAURANT_URL = "restaurantUrl";
 
             Bundle bundle = new Bundle();
-            String restaurantUrl = mRestaurant.getUrl().toString();
+            String restaurantUrl = mPlace.getWebsiteUri().toString();
             bundle.putString(RESTAURANT_URL,restaurantUrl);
             System.out.println("Url "+restaurantUrl);
 
             Intent intent = new Intent(getApplicationContext(), RestaurantWebPageActivity.class);
             intent.putExtras(bundle);
             startActivity(intent);
+        }
+        if (v.equals(mBtnLunch)) {
+            if (mLunchOn == true) {
+                this.removeLunchRestaurantForEmployeeInFirestore();
+                mBtnLunch.setImageResource(R.drawable.ic_my_choice_off);
+                mLunchOn = false;
+            } else {
+                this.addLunchRestaurantForEmployeeInFirestore();
+                mBtnLunch.setImageResource(R.drawable.ic_my_choice_on);
+                mLunchOn = true;
+            }
+
+
+
         }
 
     }
@@ -127,8 +145,7 @@ public class RestaurantActivity extends AppCompatActivity implements View.OnClic
 
         mPlacesClient.fetchPlace(request).addOnSuccessListener((response) -> {
             mPlace = response.getPlace();
-            mRestaurant = new Restaurant(mPlace.getId(),mPlace.getName(),mPlace.getAddress(), mPlace.getPhoneNumber(), mPlace.getWebsiteUri(), mPlace.getRating());
-System.out.println("Info resto : "+mPlace.getWebsiteUri());
+
             displayRestaurant();
 
             PhotoMetadata photoMetadata = mPlace.getPhotoMetadatas().get(0);
@@ -158,25 +175,52 @@ System.out.println("Info resto : "+mPlace.getWebsiteUri());
 
     private void displayRestaurant() {
         TextView restaurantName = (TextView)findViewById(R.id.restaurant_activity_name);
-        String name = (mRestaurant == null) ? "":mRestaurant.getName();
+        String name = (mPlace == null) ? "":mPlace.getName();
         restaurantName.setText(name);
 
         TextView restaurantAddress = (TextView)findViewById(R.id.restaurant_activity_address);
-        String address = (mRestaurant == null) ? "":mRestaurant.getAddress();
+        String address = (mPlace == null) ? "":mPlace.getAddress();
         restaurantAddress.setText(address);
 
         AppCompatImageView stars = (AppCompatImageView)findViewById(R.id.restaurant_activity_stars);
-        if (2 <= mRestaurant.getRating() && mRestaurant.getRating() < 3) stars.setImageResource(R.drawable.ic_star_1);
-        if (3 <= mRestaurant.getRating() && mRestaurant.getRating() < 3) stars.setImageResource(R.drawable.ic_star_2);
-        if (4 <= mRestaurant.getRating()) stars.setImageResource(R.drawable.ic_star_3);
+        if (2 <= mPlace.getRating() && mPlace.getRating() < 3) stars.setImageResource(R.drawable.ic_star_1);
+        if (3 <= mPlace.getRating() && mPlace.getRating() < 3) stars.setImageResource(R.drawable.ic_star_2);
+        if (4 <= mPlace.getRating()) stars.setImageResource(R.drawable.ic_star_3);
 
-        if (mRestaurant.getPhone() == null) {
+        if (mPlace.getPhoneNumber() == null) {
             mBtnCall.setEnabled(false);
             mBtnCall.setTextColor(getResources().getColor(R.color.light_grey));
+            mBtnCall.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_call_off, 0, 0);
         }
-        if (mRestaurant.getUrl() == null) {
+        if (mPlace.getWebsiteUri() == null) {
             mBtnWeb.setEnabled(false);
             mBtnWeb.setTextColor(getResources().getColor(R.color.light_grey));
+            mBtnWeb.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_web_off, 0, 0);
+        }
+    }
+
+    private void addLikedRestaurantForEmployeeInFirestore(){
+        if (this.getCurrentUser() != null){
+            String uid = this.getCurrentUser().getUid();
+            String likedRestaurant = mPlace.getName();
+            List<String> likedPlaces = new ArrayList<String>();
+            likedPlaces.add(likedRestaurant);
+            EmployeeHelper.updateLikedPlaces(uid, likedPlaces).addOnFailureListener(this.onFailureListener());
+        }
+    }
+
+    private void addLunchRestaurantForEmployeeInFirestore(){
+        if (this.getCurrentUser() != null){
+            String uid = this.getCurrentUser().getUid();
+            String lunchRestaurant = mPlace.getName();
+            EmployeeHelper.updateLunchPlace(uid, lunchRestaurant).addOnFailureListener(this.onFailureListener());
+        }
+    }
+
+    private void removeLunchRestaurantForEmployeeInFirestore() {
+        if (this.getCurrentUser() != null){
+            String uid = this.getCurrentUser().getUid();
+            EmployeeHelper.updateLunchPlace(uid, null).addOnFailureListener(this.onFailureListener());
         }
     }
 }

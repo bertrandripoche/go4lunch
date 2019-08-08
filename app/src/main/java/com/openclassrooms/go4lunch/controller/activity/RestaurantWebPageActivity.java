@@ -11,7 +11,7 @@ import com.openclassrooms.go4lunch.R;
 
 import java.util.Objects;
 
-public class RestaurantWebPageActivity extends AppCompatActivity {
+public class RestaurantWebPageActivity extends BaseActivity {
     final String RESTAURANT_URL = "restaurantUrl";
     private WebView webView;
     private Bundle mExtras;
@@ -26,7 +26,6 @@ public class RestaurantWebPageActivity extends AppCompatActivity {
 
         mExtras = getBundle();
         mRestaurantUrl = getRestaurantUrlFromBundle();
-        System.out.println("Adresse web "+mRestaurantUrl);
 
         if (mRestaurantUrl != null) {
             webView = (WebView) findViewById(R.id.webView);

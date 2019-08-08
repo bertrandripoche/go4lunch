@@ -75,30 +75,29 @@
                 android:textColor="@color/orange"
                 android:textSize="15sp" />
 
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="50dp"
-                    android:layout_weight="1"
-                    android:id="@+id/btnLike"
-                    android:text="@string/title_like"
-                    android:textSize="15sp"
-                    android:textColor="@color/orange"
-                    android:gravity="center"
-                    android:drawableTop="@drawable/ic_star"
-                    android:background="@color/white"/>
+            <Button
+                android:id="@+id/btnLike"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:text="@string/title_like"
+                android:textSize="15sp"
+                android:textColor="@color/orange"
+                android:gravity="center"
+                android:drawableTop="@drawable/ic_star"
+                android:background="@color/white"/>
 
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="50dp"
-                    android:layout_weight="1"
-                    android:id="@+id/btnWeb"
-                    android:text="@string/title_web"
-                    android:textSize="15sp"
-                    android:textColor="@color/orange"
-                    android:gravity="center"
-                    android:drawableTop="@drawable/ic_web"
-                    android:background="@color/white"/>
-
+            <Button
+                android:id="@+id/btnWeb"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:text="@string/title_web"
+                android:textSize="15sp"
+                android:textColor="@color/orange"
+                android:gravity="center"
+                android:drawableTop="@drawable/ic_web"
+                android:background="@color/white"/>
         </LinearLayout>
 
         <View
@@ -108,13 +107,17 @@
     </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/mBtnLunch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_margin="16dp"
         android:backgroundTint="@color/white"
-        android:src="@drawable/ic_my_choice"
+        android:clickable="true"
+        android:elevation="6dp"
+        android:focusable="true"
+        android:src="@drawable/ic_my_choice_off"
+        app:fabSize="normal"
         app:layout_anchor="@id/restaurant_activity_pic"
         app:layout_anchorGravity="bottom|right|end"
-        android:elevation="6dp"
-        android:layout_margin="16dp"
-        android:clickable="true"/>
+        app:maxImageSize="50dp" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

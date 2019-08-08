@@ -1,45 +1,29 @@
 package com.openclassrooms.go4lunch.model;
 
-import android.net.Uri;
+import java.util.HashMap;
 
 public class Restaurant {
-    private String mId;
-    private String mName;
-    private String mAddress;
-    private String mPhone;
-    private Uri mUrl;
-    private Double mRating;
+    private String id;
+    private String name;
+    private HashMap<String, String> likes;
+    private HashMap<String, String> lunchPlaces;
 
-    public Restaurant(String id, String name, String address, String phone, Uri url, Double rating) {
-        mId = id;
-        mName = name;
-        mAddress = address;
-        mPhone = phone;
-        mUrl = url;
-        mRating = rating;
+    public Restaurant(String id, String name, HashMap<String, String> likes, HashMap<String, String> lunchPlaces) {
+        this.id = id;
+        this.name = name;
+        this.likes = likes;
+        this.lunchPlaces = lunchPlaces;
     }
 
-    public String getId() {
-        return mId;
-    }
+    // --- GETTERS ---
+    public String getId() {return id;}
+    public String getName() {return name;}
+    public HashMap<String, String> getLikes() {return likes;}
+    public HashMap<String, String> getLunchPlaces() {return lunchPlaces;}
 
-    public String getName() {
-        return mName;
-    }
-
-    public String getAddress() {
-        return mAddress;
-    }
-
-    public String getPhone() {
-        return mPhone;
-    }
-
-    public Uri getUrl() {
-        return mUrl;
-    }
-
-    public Double getRating() {
-        return mRating;
-    }
+    // --- SETTERS ---
+    public void setId(String id) {this.id = id;}
+    public void setName(String name) {this.name = name;}
+    public void setLikes(HashMap<String, String> likes) {this.likes = likes;}
+    public void setLunchPlaces(HashMap<String, String> lunchPlaces) {this.lunchPlaces = lunchPlaces;}
 }

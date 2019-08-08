@@ -19,7 +19,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseUser;
@@ -29,7 +28,7 @@ import com.openclassrooms.go4lunch.controller.fragment.MapFragment;
 import com.openclassrooms.go4lunch.controller.fragment.WorkmatesFragment;
 import com.openclassrooms.go4lunch.utils.FirebaseUserManagement;
 
-public class PrincipalActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class PrincipalActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private AppCompatImageView mProfilePic;
     private TextView mProfileName;

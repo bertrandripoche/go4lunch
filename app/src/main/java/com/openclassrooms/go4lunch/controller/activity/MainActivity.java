@@ -6,6 +6,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.health.SystemHealthManager;
 import android.widget.Button;
 
 import com.firebase.ui.auth.AuthUI;
@@ -16,6 +17,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.openclassrooms.go4lunch.R;
+import com.openclassrooms.go4lunch.api.EmployeeHelper;
 
 import java.util.Arrays;
 
@@ -23,7 +25,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
     @BindView(R.id.main_activity_coordinator_layout) CoordinatorLayout coordinatorLayout;
     @BindView(R.id.main_activity_button_login_facebook) Button buttonLoginFacebook;
     @BindView(R.id.main_activity_button_login_google) Button buttonLoginGoogle;
@@ -93,11 +95,6 @@ public class MainActivity extends AppCompatActivity {
                 RC_SIGN_IN);
     }
 
-    @Nullable
-    protected FirebaseUser getCurrentUser(){ return FirebaseAuth.getInstance().getCurrentUser(); }
-
-    protected Boolean isCurrentUserLogged(){ return (this.getCurrentUser() != null); }
-
     private void showSnackBar(CoordinatorLayout coordinatorLayout, String message){
         Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_SHORT).show();
     }
@@ -107,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) {
+                this.createUserInFirestore();
                 startPrincipalActivity();
             } else {
                 if (response == null) {
@@ -138,5 +136,18 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
+    }
+
+    private void createUserInFirestore(){
+
+        if (this.getCurrentUser() != null){
+
+            String uid = this.getCurrentUser().getUid();
+            String name = this.getCurrentUser().getDisplayName();
+            String mail = this.getCurrentUser().getEmail();
+            String urlPicture = (this.getCurrentUser().getPhotoUrl() != null) ? this.getCurrentUser().getPhotoUrl().toString() : null;
+            System.out.println("Infos employee : "+ uid +" - "+ name +" - "+ mail +" - "+ urlPicture +"...");
+            EmployeeHelper.createEmployee(uid, name, mail, urlPicture, null, null).addOnFailureListener(this.onFailureListener());
+        }
     }
 }
