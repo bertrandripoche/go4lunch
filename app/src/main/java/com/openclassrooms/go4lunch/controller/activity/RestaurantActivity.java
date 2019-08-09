@@ -42,8 +42,8 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
     private Button mBtnLike;
     private Button mBtnWeb;
     private FloatingActionButton mBtnLunch;
-    private static boolean mLikeOn;
-    private static boolean mLunchOn;
+    private static boolean mLikeOn = false;
+    private static boolean mLunchOn = false;
     private Employee mCurrentEmployee;
 
     final String PLACE_ID = "placeId";
@@ -115,6 +115,7 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
             startActivity(intent);
         }
         if (v.equals(mBtnLunch)) {
+            System.out.println("LunchOn : "+mLunchOn);
             if (mLunchOn) {
                 this.removeLunchRestaurantForEmployeeInFirestore();
                 mBtnLunch.setImageResource(R.drawable.ic_my_choice_off);
@@ -248,12 +249,12 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
                     if (lunchPlace != null && lunchPlace.equals(thisRestaurant)) {
                         mBtnLunch.setImageResource(R.drawable.ic_my_choice_on);
                         mLunchOn = true;
-                    }
+                    } else {mLunchOn = false;}
                     if (likedPlaces != null && likedPlaces.contains(thisRestaurant)) {
                         mBtnLike.setTextColor(getResources().getColor(R.color.yellow));
                         mBtnLike.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_star_1, 0, 0);
                         mLikeOn = true;
-                    }
+                    } else {mLikeOn = false;}
                 }
             });
         }
