@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
 
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
@@ -21,8 +22,10 @@ import com.google.android.libraries.places.api.net.FetchPhotoRequest;
 import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.openclassrooms.go4lunch.R;
 import com.openclassrooms.go4lunch.api.EmployeeHelper;
+import com.openclassrooms.go4lunch.model.Employee;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,16 +35,18 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
     private static final String TAG = "Restaurant Log - ";
     private Bundle mExtras;
     private String mPlaceId;
+    private String mEmployeeUid;
     private PlacesClient mPlacesClient;
     private Place mPlace;
     private Button mBtnCall;
     private Button mBtnLike;
     private Button mBtnWeb;
     private FloatingActionButton mBtnLunch;
+    private static boolean mLikeOn;
+    private static boolean mLunchOn;
+    private Employee mCurrentEmployee;
 
     final String PLACE_ID = "placeId";
-    private static boolean mLikeOn;
-    private boolean mLunchOn;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -61,12 +66,12 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
         mExtras = getBundle();
         mPlaceId = getPlaceIdFromBundle();
 
+        getUid();
         Places.initialize(getApplicationContext(), getString(R.string.google_maps_key));
         mPlacesClient = Places.createClient(this);
 
         getPlaceInfo(mPlaceId);
     }
-
 
     @Override
     public void onClick(View v) {
@@ -86,8 +91,7 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
 
         }
         if (v.equals(mBtnLike)) {
-
-            if (mLikeOn == true) {
+            if (mLikeOn) {
                 mBtnLike.setTextColor(getResources().getColor(R.color.orange));
                 mBtnLike.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_star, 0, 0);
                 mLikeOn = false;
@@ -97,8 +101,6 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
                 mBtnLike.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_star_1, 0, 0);
                 mLikeOn = true;
             }
-
-
         }
         if (v.equals(mBtnWeb)) {
             final String RESTAURANT_URL = "restaurantUrl";
@@ -113,7 +115,7 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
             startActivity(intent);
         }
         if (v.equals(mBtnLunch)) {
-            if (mLunchOn == true) {
+            if (mLunchOn) {
                 this.removeLunchRestaurantForEmployeeInFirestore();
                 mBtnLunch.setImageResource(R.drawable.ic_my_choice_off);
                 mLunchOn = false;
@@ -122,11 +124,13 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
                 mBtnLunch.setImageResource(R.drawable.ic_my_choice_on);
                 mLunchOn = true;
             }
-
-
-
         }
+    }
 
+    private void getUid() {
+        if (this.getCurrentUser() != null){
+            mEmployeeUid = this.getCurrentUser().getUid();
+        }
     }
 
     private Bundle getBundle() {
@@ -146,6 +150,7 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
         mPlacesClient.fetchPlace(request).addOnSuccessListener((response) -> {
             mPlace = response.getPlace();
 
+            checkLunchAndLike();
             displayRestaurant();
 
             PhotoMetadata photoMetadata = mPlace.getPhotoMetadatas().get(0);
@@ -170,7 +175,6 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
                 Log.e(TAG, "Restaurant not found: " + exception.getMessage());
             }
         });
-
     }
 
     private void displayRestaurant() {
@@ -201,27 +205,59 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
 
     private void addLikedRestaurantForEmployeeInFirestore(){
         if (this.getCurrentUser() != null){
-            String uid = this.getCurrentUser().getUid();
             String likedRestaurant = mPlace.getName();
             List<String> likedPlaces = new ArrayList<String>();
             likedPlaces.add(likedRestaurant);
-            EmployeeHelper.updateLikedPlaces(uid, likedPlaces).addOnFailureListener(this.onFailureListener());
+            EmployeeHelper.updateLikedPlaces(mEmployeeUid, likedPlaces).addOnFailureListener(this.onFailureListener());
+        }
+    }
+
+    private void removeLikedRestaurantForEmployeeInFirestore() {
+        if (this.getCurrentUser() != null){
+            EmployeeHelper.updateLunchPlace(mEmployeeUid, null).addOnFailureListener(this.onFailureListener());
         }
     }
 
     private void addLunchRestaurantForEmployeeInFirestore(){
         if (this.getCurrentUser() != null){
-            String uid = this.getCurrentUser().getUid();
             String lunchRestaurant = mPlace.getName();
-            EmployeeHelper.updateLunchPlace(uid, lunchRestaurant).addOnFailureListener(this.onFailureListener());
+            String lunchRestaurantId = mPlace.getId();
+            EmployeeHelper.updateLunchPlace(mEmployeeUid, lunchRestaurant).addOnFailureListener(this.onFailureListener());
+            EmployeeHelper.updateLunchPlaceId(mEmployeeUid, lunchRestaurantId).addOnFailureListener(this.onFailureListener());
         }
     }
 
     private void removeLunchRestaurantForEmployeeInFirestore() {
         if (this.getCurrentUser() != null){
-            String uid = this.getCurrentUser().getUid();
-            EmployeeHelper.updateLunchPlace(uid, null).addOnFailureListener(this.onFailureListener());
+            EmployeeHelper.updateLunchPlace(mEmployeeUid, null).addOnFailureListener(this.onFailureListener());
+            EmployeeHelper.updateLunchPlaceId(mEmployeeUid, null).addOnFailureListener(this.onFailureListener());
         }
     }
+
+    private void checkLunchAndLike() {
+        if (this.getCurrentUser() != null){
+            EmployeeHelper.getEmployee(mEmployeeUid).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    mCurrentEmployee = documentSnapshot.toObject(Employee.class);
+
+                    String thisRestaurant = mPlace.getName();
+                    String lunchPlace = mCurrentEmployee.getLunchPlace();
+                    List<String> likedPlaces = mCurrentEmployee.getLikedPlaces();
+                    System.out.println("Lunch - "+lunchPlace+"-Resto actuel"+mPlace.getName()+"-Resto likés"+likedPlaces);
+                    if (lunchPlace != null && lunchPlace.equals(thisRestaurant)) {
+                        mBtnLunch.setImageResource(R.drawable.ic_my_choice_on);
+                        mLunchOn = true;
+                    }
+                    if (likedPlaces != null && likedPlaces.contains(thisRestaurant)) {
+                        mBtnLike.setTextColor(getResources().getColor(R.color.yellow));
+                        mBtnLike.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_star_1, 0, 0);
+                        mLikeOn = true;
+                    }
+                }
+            });
+        }
+    }
+
 }
 

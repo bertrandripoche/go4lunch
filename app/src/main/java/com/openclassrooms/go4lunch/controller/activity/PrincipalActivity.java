@@ -1,11 +1,13 @@
 package com.openclassrooms.go4lunch.controller.activity;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,13 +21,17 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.openclassrooms.go4lunch.R;
+import com.openclassrooms.go4lunch.api.EmployeeHelper;
 import com.openclassrooms.go4lunch.controller.fragment.ListFragment;
 import com.openclassrooms.go4lunch.controller.fragment.MapFragment;
 import com.openclassrooms.go4lunch.controller.fragment.WorkmatesFragment;
+import com.openclassrooms.go4lunch.model.Employee;
 import com.openclassrooms.go4lunch.utils.FirebaseUserManagement;
 
 public class PrincipalActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -38,6 +44,9 @@ public class PrincipalActivity extends BaseActivity implements NavigationView.On
     private DrawerLayout mDrawerLayout;
     private FirebaseUserManagement mFirebaseUserManagement;
     private FirebaseUser mCurrentUser;
+    private NavigationView navigationView;
+
+    private boolean mIsLunchSet;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -82,7 +91,33 @@ public class PrincipalActivity extends BaseActivity implements NavigationView.On
         int id = item.getItemId();
         switch (id){
             case R.id.activity_main_drawer_lunch:
-                System.out.println("MENU LUNCH");
+                final String PLACE_ID = "placeId";
+
+                if (this.getCurrentUser() != null){
+                    String mEmployeeUid = this.getCurrentUser().getUid();
+                    EmployeeHelper.getEmployee(mEmployeeUid).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                        @Override
+                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+                            Employee mCurrentEmployee = documentSnapshot.toObject(Employee.class);
+                            String lunchPlaceId = mCurrentEmployee.getLunchPlaceId();
+
+                            if (lunchPlaceId != null) {
+                                Bundle bundle = new Bundle();
+                                bundle.putString(PLACE_ID, lunchPlaceId);
+
+                                Intent intent = new Intent(getApplicationContext(), RestaurantActivity.class);
+                                intent.putExtras(bundle);
+                                startActivity(intent);
+                            } else {
+//                                Menu menuNav=navigationView.getMenu();
+//                                MenuItem yourLunch = menuNav.findItem(R.id.activity_main_drawer_lunch);
+//                                yourLunch.setEnabled(false);
+                                Toast.makeText(getApplicationContext(),R.string.no_lunch_defined,Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    });
+                }
+
                 return true;
             case R.id.activity_main_drawer_settings:
                 System.out.println("MENU SETTINGS");
@@ -133,7 +168,7 @@ public class PrincipalActivity extends BaseActivity implements NavigationView.On
     }
 
     private void configureNavigationView(){
-        NavigationView navigationView = findViewById(R.id.activity_main_nav_view);
+        navigationView = findViewById(R.id.activity_main_nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         mCurrentUser = FirebaseUserManagement.getCurrentUser();
@@ -151,7 +186,21 @@ public class PrincipalActivity extends BaseActivity implements NavigationView.On
                 .fitCenter()
                 .circleCrop()
                 .into(userPic);
+    }
 
+    private boolean isLunchPlaceSet() {
+        if (this.getCurrentUser() != null){
+            String mEmployeeUid = this.getCurrentUser().getUid();
+            EmployeeHelper.getEmployee(mEmployeeUid).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    String lunchPlaceId = documentSnapshot.toObject(Employee.class).getLunchPlaceId();
+                    mIsLunchSet = lunchPlaceId != null;
+                    System.out.println("LunchPlace : "+lunchPlaceId+"IsLunchSet"+mIsLunchSet);
+                }
+            });
+        }
+        return mIsLunchSet;
     }
 
 }

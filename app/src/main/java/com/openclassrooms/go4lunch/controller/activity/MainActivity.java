@@ -147,7 +147,7 @@ public class MainActivity extends BaseActivity {
             String mail = this.getCurrentUser().getEmail();
             String urlPicture = (this.getCurrentUser().getPhotoUrl() != null) ? this.getCurrentUser().getPhotoUrl().toString() : null;
             System.out.println("Infos employee : "+ uid +" - "+ name +" - "+ mail +" - "+ urlPicture +"...");
-            EmployeeHelper.createEmployee(uid, name, mail, urlPicture, null, null).addOnFailureListener(this.onFailureListener());
+            EmployeeHelper.createEmployee(uid, name, mail, urlPicture, null, null,null).addOnFailureListener(this.onFailureListener());
         }
     }
 }

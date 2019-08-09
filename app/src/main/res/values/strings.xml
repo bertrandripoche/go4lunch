@@ -43,5 +43,6 @@
     <string name="restaurant_address">Restaurant address</string>
     <string name="restaurant_name">Restaurant name</string>
     <string name="no_phone_available">No phone available</string>
+    <string name="no_lunch_defined">No lunch place defined</string>
 
 </resources>
