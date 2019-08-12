@@ -288,7 +288,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                                 if (currPlace.getTypes().contains(Place.Type.RESTAURANT)) {
                                     String mLikelyPlaceNames = currPlace.getName();
                                     LatLng mLikelyPlaceLatLngs = currPlace.getLatLng();
-                                    System.out.println("Id du resto : "+currPlace.getId() + " - Position : "+currPlace.getLatLng());
+//                                    System.out.println("Id du resto : "+currPlace.getId() + " - Position : "+currPlace.getLatLng());
 
                                     String currLatLng = (mLikelyPlaceLatLngs == null) ?
                                             "" : mLikelyPlaceLatLngs.toString();

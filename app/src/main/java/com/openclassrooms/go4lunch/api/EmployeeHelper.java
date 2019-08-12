@@ -8,6 +8,7 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.openclassrooms.go4lunch.model.Employee;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class EmployeeHelper {
@@ -21,7 +22,7 @@ public class EmployeeHelper {
 
     // --- CREATE ---
 
-    public static Task<Void> createEmployee(String uid, String name, String mail, String urlPicture, String lunchPlace, String lunchPlaceId, List<String> likedPlaces) {
+    public static Task<Void> createEmployee(String uid, String name, String mail, String urlPicture, String lunchPlace, String lunchPlaceId, HashMap<String, String> likedPlaces) {
         Employee employeeToCreate = new Employee(uid, name, mail, urlPicture, lunchPlace, lunchPlaceId, likedPlaces);
         return EmployeeHelper.getEmployeesCollection().document(uid).set(employeeToCreate);
     }
@@ -50,7 +51,7 @@ public class EmployeeHelper {
         return EmployeeHelper.getEmployeesCollection().document(uid).update("lunchPlaceId", lunchPlaceId);
     }
 
-    public static Task<Void> updateLikedPlaces(String uid, List<String> likedPlaces) {
+    public static Task<Void> updateLikedPlaces(String uid, HashMap<String, String> likedPlaces) {
         return EmployeeHelper.getEmployeesCollection().document(uid).update("likedPlaces", likedPlaces);
     }
 
@@ -62,5 +63,9 @@ public class EmployeeHelper {
 
     public static Task<Void> deleteLunchPlaces(String uid) {
         return EmployeeHelper.getEmployeesCollection().document(uid).update("lunchPlace", FieldValue.delete());
+    }
+
+    public static Task<Void> deleteLikedPlaces(String uid) {
+        return EmployeeHelper.getEmployeesCollection().document(uid).update("likedPlaces", FieldValue.delete());
     }
 }

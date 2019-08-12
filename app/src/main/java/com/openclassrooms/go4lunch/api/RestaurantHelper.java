@@ -21,43 +21,39 @@ public class RestaurantHelper {
 
     // --- CREATE ---
 
-    public static Task<Void> createRestaurant(String id, String name, HashMap<String, String> likes, HashMap<String, String> lunchPlaces) {
-        Restaurant restaurantToCreate = new Restaurant(id, name, likes, lunchPlaces);
+    public static Task<Void> createRestaurant(String id, String name, HashMap<String, String> likes, HashMap<String, String> lunchAttendees) {
+        Restaurant restaurantToCreate = new Restaurant(id, name, likes, lunchAttendees);
         return RestaurantHelper.getRestaurantsCollection().document(id).set(restaurantToCreate);
     }
 
     // --- GET ---
 
-    public static Task<DocumentSnapshot> getRestaurant(String uid){
-        return RestaurantHelper.getRestaurantsCollection().document(uid).get();
+    public static Task<DocumentSnapshot> getRestaurant(String id){
+        return RestaurantHelper.getRestaurantsCollection().document(id).get();
     }
 
     // --- UPDATE ---
 
-    public static Task<Void> updateName(String name, String uid) {
-        return RestaurantHelper.getRestaurantsCollection().document(uid).update("name", name);
+    public static Task<Void> updateName(String id, String name) {
+        return RestaurantHelper.getRestaurantsCollection().document(id).update("name", name);
     }
 
-    public static Task<Void> updateMail(String uid, String mail) {
-        return RestaurantHelper.getRestaurantsCollection().document(uid).update("mail", mail);
+    public static Task<Void> updateLikes(String id, HashMap<String, String> likes) {
+        return RestaurantHelper.getRestaurantsCollection().document(id).update("likes", likes);
     }
 
-    public static Task<Void> updateLikes(String uid, List<String> likedPlaces) {
-        return RestaurantHelper.getRestaurantsCollection().document(uid).update("likes", likedPlaces);
-    }
-
-    public static Task<Void> updateLunchPlace(String uid, String lunchPlace) {
-        return RestaurantHelper.getRestaurantsCollection().document(uid).update("lunchPlace", lunchPlace);
+    public static Task<Void> updateLunchAttendees(String id, HashMap<String, String> lunchAttendees) {
+        return RestaurantHelper.getRestaurantsCollection().document(id).update("lunchAttendees", lunchAttendees);
     }
 
     // --- DELETE ---
 
-    public static Task<Void> deleteRestaurant(String uid) {
-        return RestaurantHelper.getRestaurantsCollection().document(uid).delete();
+    public static Task<Void> deleteRestaurant(String id) {
+        return RestaurantHelper.getRestaurantsCollection().document(id).delete();
     }
 
-    public static Task<Void> deleteLunchPlaces(String uid) {
-        return RestaurantHelper.getRestaurantsCollection().document(uid).update("lunchPlace", null);
+    public static Task<Void> deleteLunchPlaces(String id) {
+        return RestaurantHelper.getRestaurantsCollection().document(id).update("lunchAttendees", null);
     }
 
     public static Task<Void> deleteLikes(String uid) {

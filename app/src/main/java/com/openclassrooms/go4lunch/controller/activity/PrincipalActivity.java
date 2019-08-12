@@ -196,7 +196,7 @@ public class PrincipalActivity extends BaseActivity implements NavigationView.On
                 public void onSuccess(DocumentSnapshot documentSnapshot) {
                     String lunchPlaceId = documentSnapshot.toObject(Employee.class).getLunchPlaceId();
                     mIsLunchSet = lunchPlaceId != null;
-                    System.out.println("LunchPlace : "+lunchPlaceId+"IsLunchSet"+mIsLunchSet);
+//                    System.out.println("LunchPlace : "+lunchPlaceId+"IsLunchSet"+mIsLunchSet);
                 }
             });
         }

@@ -10,10 +10,12 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
 
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.PhotoMetadata;
@@ -25,17 +27,27 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.openclassrooms.go4lunch.R;
 import com.openclassrooms.go4lunch.api.EmployeeHelper;
+import com.openclassrooms.go4lunch.api.RestaurantHelper;
+import com.openclassrooms.go4lunch.api.TeamHelper;
 import com.openclassrooms.go4lunch.model.Employee;
+import com.openclassrooms.go4lunch.model.Restaurant;
+import com.openclassrooms.go4lunch.model.Team;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class RestaurantActivity extends BaseActivity implements View.OnClickListener {
     private static final String TAG = "Restaurant Log - ";
     private Bundle mExtras;
     private String mPlaceId;
     private String mEmployeeUid;
+    private String mEmployeeName;
+    private String mEmployeePic;
+    private String mEmployeeParameterForTeam;
+    private String mLunchPlaceToRemove;
     private PlacesClient mPlacesClient;
     private Place mPlace;
     private Button mBtnCall;
@@ -47,6 +59,8 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
     private Employee mCurrentEmployee;
 
     final String PLACE_ID = "placeId";
+    final String TEAM = "team";
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -85,13 +99,13 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
                 startActivity(callIntent);
 
             } else {
-                System.out.println("Pas de téléphone");
                 Toast.makeText(this, R.string.no_phone_available, Toast.LENGTH_LONG).show();
             }
 
         }
         if (v.equals(mBtnLike)) {
             if (mLikeOn) {
+                this.removeLikedRestaurantForEmployeeInFirestore();
                 mBtnLike.setTextColor(getResources().getColor(R.color.orange));
                 mBtnLike.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_star, 0, 0);
                 mLikeOn = false;
@@ -108,14 +122,12 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
             Bundle bundle = new Bundle();
             String restaurantUrl = mPlace.getWebsiteUri().toString();
             bundle.putString(RESTAURANT_URL,restaurantUrl);
-            System.out.println("Url "+restaurantUrl);
 
             Intent intent = new Intent(getApplicationContext(), RestaurantWebPageActivity.class);
             intent.putExtras(bundle);
             startActivity(intent);
         }
         if (v.equals(mBtnLunch)) {
-            System.out.println("LunchOn : "+mLunchOn);
             if (mLunchOn) {
                 this.removeLunchRestaurantForEmployeeInFirestore();
                 mBtnLunch.setImageResource(R.drawable.ic_my_choice_off);
@@ -131,6 +143,8 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
     private void getUid() {
         if (this.getCurrentUser() != null){
             mEmployeeUid = this.getCurrentUser().getUid();
+            mEmployeeName = this.getCurrentUser().getDisplayName();
+            mEmployeePic = (Objects.requireNonNull(this.getCurrentUser().getPhotoUrl()).toString().equals("")) ? "noPicture": this.getCurrentUser().getPhotoUrl().toString();
         }
     }
 
@@ -206,16 +220,72 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
 
     private void addLikedRestaurantForEmployeeInFirestore(){
         if (this.getCurrentUser() != null){
-            String likedRestaurant = mPlace.getName();
-            List<String> likedPlaces = new ArrayList<String>();
-            likedPlaces.add(likedRestaurant);
-            EmployeeHelper.updateLikedPlaces(mEmployeeUid, likedPlaces).addOnFailureListener(this.onFailureListener());
+            EmployeeHelper.getEmployee(mEmployeeUid).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    mCurrentEmployee = documentSnapshot.toObject(Employee.class);
+                    String thisRestaurant = mPlace.getName();
+                    String thisRestaurantId = mPlace.getId();
+                    HashMap<String, String> likedPlaces = (mCurrentEmployee.getLikedPlaces() != null) ? mCurrentEmployee.getLikedPlaces(): new HashMap<String, String>();;
+
+                    if (likedPlaces.isEmpty() || !likedPlaces.containsKey(thisRestaurantId)) {
+                        likedPlaces.put(thisRestaurantId, thisRestaurant);
+                    }
+                    EmployeeHelper.updateLikedPlaces(mEmployeeUid, likedPlaces).addOnFailureListener(onFailureListener());
+                }
+            });
+
+            RestaurantHelper.getRestaurant(mPlaceId).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    Restaurant restaurant = documentSnapshot.toObject(Restaurant.class);
+                    if (restaurant == null) {
+                        HashMap<String, String> likes = new HashMap<String, String>();
+                        likes.put(mEmployeeName,mEmployeePic);
+                        RestaurantHelper.createRestaurant(mPlaceId,mPlace.getName(),likes,null).addOnFailureListener(onFailureListener());
+                    } else {
+                        HashMap<String, String > likes = (restaurant.getLikes() == null) ? new HashMap<String, String>() : restaurant.getLikes();
+                        if (likes.isEmpty() || !likes.containsKey(mEmployeeName)) {
+                            likes.put(mEmployeeName, mEmployeePic);
+                        }
+                        likes.put(mEmployeeName,mEmployeePic);
+                        RestaurantHelper.updateLikes(mPlaceId, likes).addOnFailureListener(onFailureListener());
+                    }
+                }
+            });
+
+
         }
     }
 
     private void removeLikedRestaurantForEmployeeInFirestore() {
         if (this.getCurrentUser() != null){
-            EmployeeHelper.updateLunchPlace(mEmployeeUid, null).addOnFailureListener(this.onFailureListener());
+            EmployeeHelper.getEmployee(mEmployeeUid).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    mCurrentEmployee = documentSnapshot.toObject(Employee.class);
+                    String thisRestaurant = mPlace.getName();
+                    String thisRestaurantId = mPlace.getId();
+                    HashMap<String, String > likedPlaces = mCurrentEmployee.getLikedPlaces();
+
+                    if (likedPlaces != null && likedPlaces.containsKey(thisRestaurantId)) {
+                        likedPlaces.remove(thisRestaurantId);
+                    }
+                    EmployeeHelper.updateLikedPlaces(mEmployeeUid, likedPlaces).addOnFailureListener(onFailureListener());
+                }
+            });
+
+            RestaurantHelper.getRestaurant(mPlaceId).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    Restaurant restaurant = documentSnapshot.toObject(Restaurant.class);
+                    HashMap<String, String > likes = restaurant.getLikes();
+                    if (likes != null && likes.containsKey(mEmployeeName)) {
+                        likes.remove(mEmployeeName);
+                    }
+                    RestaurantHelper.updateLikes(mPlaceId, likes).addOnFailureListener(onFailureListener());
+                }
+            });
         }
     }
 
@@ -223,8 +293,57 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
         if (this.getCurrentUser() != null){
             String lunchRestaurant = mPlace.getName();
             String lunchRestaurantId = mPlace.getId();
+
             EmployeeHelper.updateLunchPlace(mEmployeeUid, lunchRestaurant).addOnFailureListener(this.onFailureListener());
             EmployeeHelper.updateLunchPlaceId(mEmployeeUid, lunchRestaurantId).addOnFailureListener(this.onFailureListener());
+
+            RestaurantHelper.getRestaurant(mPlaceId).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    Restaurant restaurant = documentSnapshot.toObject(Restaurant.class);
+                    if (restaurant == null) {
+                        HashMap<String, String> lunchAttendees = new HashMap<String, String>();
+                        lunchAttendees.put(mEmployeeName,mEmployeePic);
+                        RestaurantHelper.createRestaurant(mPlaceId,mPlace.getName(),null,lunchAttendees).addOnFailureListener(onFailureListener());
+                    } else {
+                        HashMap<String, String > lunchAttendees = (restaurant.getLunchAttendees() == null) ? new HashMap<String, String>() : restaurant.getLunchAttendees();
+                        if (lunchAttendees.isEmpty() || !lunchAttendees.containsKey(mEmployeeName)) {
+                            lunchAttendees.put(mEmployeeName, mEmployeePic);
+                        }
+                        lunchAttendees.put(mEmployeeName,mEmployeePic);
+                        RestaurantHelper.updateLunchAttendees(mPlaceId, lunchAttendees).addOnFailureListener(onFailureListener());
+                    }
+
+                }
+            });
+
+            TeamHelper.getTeam().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    Team team = documentSnapshot.toObject(Team.class);
+                    HashMap<String, String > lunchPlaceByEmployee = (team.getLunchPlaceByEmployee() == null) ? new HashMap<String, String>() : team.getLunchPlaceByEmployee();
+
+                    String valueForTeam = (mEmployeePic == null) ? "Null___"+mPlace.getName() : mEmployeePic+"___"+mPlace.getName();
+                    lunchPlaceByEmployee.put(mEmployeeName, valueForTeam);
+                    TeamHelper.updateLunchPlaceByEmployee(lunchPlaceByEmployee);
+                }
+            });
+
+            System.out.println("mLunchPlaceToRemove : "+mLunchPlaceToRemove+" - mPlaceId : "+mPlaceId);
+            if (mLunchPlaceToRemove != null && mLunchPlaceToRemove != mPlaceId)  {
+                System.out.println("Lieu à effacer : "+mLunchPlaceToRemove);
+                RestaurantHelper.getRestaurant(mLunchPlaceToRemove).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        Restaurant restaurant = documentSnapshot.toObject(Restaurant.class);
+                        HashMap<String, String > lunchAttendees = restaurant.getLunchAttendees();
+                        if (lunchAttendees != null && lunchAttendees.containsKey(mEmployeeName)) {
+                            lunchAttendees.remove(mEmployeeName);
+                        }
+                        RestaurantHelper.updateLunchAttendees(mLunchPlaceToRemove, lunchAttendees).addOnFailureListener(onFailureListener());
+                    }
+                });
+            }
         }
     }
 
@@ -232,6 +351,29 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
         if (this.getCurrentUser() != null){
             EmployeeHelper.updateLunchPlace(mEmployeeUid, null).addOnFailureListener(this.onFailureListener());
             EmployeeHelper.updateLunchPlaceId(mEmployeeUid, null).addOnFailureListener(this.onFailureListener());
+
+            RestaurantHelper.getRestaurant(mPlaceId).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    Restaurant restaurant = documentSnapshot.toObject(Restaurant.class);
+                    HashMap<String, String > lunchAttendees = restaurant.getLunchAttendees();
+                    if (lunchAttendees != null && lunchAttendees.containsKey(mEmployeeName)) {
+                        lunchAttendees.remove(mEmployeeName);
+                    }
+                    RestaurantHelper.updateLunchAttendees(mPlaceId, lunchAttendees).addOnFailureListener(onFailureListener());
+                }
+            });
+
+            TeamHelper.getTeam().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    Team team = documentSnapshot.toObject(Team.class);
+                    HashMap<String, String > lunchPlaceByEmployee = (team.getLunchPlaceByEmployee() == null) ? new HashMap<String, String>() : team.getLunchPlaceByEmployee();
+                    String valueForTeam = (mEmployeePic == null) ? "Null___" : mEmployeePic+"___";
+                    lunchPlaceByEmployee.put(mEmployeeName, valueForTeam);
+                    TeamHelper.updateLunchPlaceByEmployee(lunchPlaceByEmployee);
+                }
+            });
         }
     }
 
@@ -243,14 +385,16 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
                     mCurrentEmployee = documentSnapshot.toObject(Employee.class);
 
                     String thisRestaurant = mPlace.getName();
+                    String thisRestaurantId = mPlace.getId();
                     String lunchPlace = mCurrentEmployee.getLunchPlace();
-                    List<String> likedPlaces = mCurrentEmployee.getLikedPlaces();
-                    System.out.println("Lunch - "+lunchPlace+"-Resto actuel"+mPlace.getName()+"-Resto likés"+likedPlaces);
+                    mLunchPlaceToRemove = mCurrentEmployee.getLunchPlaceId();
+                    HashMap<String, String> likedPlaces = mCurrentEmployee.getLikedPlaces();
+//                    System.out.println("Lunch - "+lunchPlace+"-Resto actuel"+mPlace.getName()+"-Resto likés"+likedPlaces);
                     if (lunchPlace != null && lunchPlace.equals(thisRestaurant)) {
                         mBtnLunch.setImageResource(R.drawable.ic_my_choice_on);
                         mLunchOn = true;
                     } else {mLunchOn = false;}
-                    if (likedPlaces != null && likedPlaces.contains(thisRestaurant)) {
+                    if (likedPlaces != null && likedPlaces.containsKey(thisRestaurantId)) {
                         mBtnLike.setTextColor(getResources().getColor(R.color.yellow));
                         mBtnLike.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_star_1, 0, 0);
                         mLikeOn = true;
@@ -259,6 +403,39 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
             });
         }
     }
+
+//    private String checkPreviousLunch() {
+//        if (this.getCurrentUser() != null){
+//
+//            EmployeeHelper.getEmployee(mEmployeeUid).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+//                @Override
+//                public void onSuccess(DocumentSnapshot documentSnapshot) {
+//                    mCurrentEmployee = documentSnapshot.toObject(Employee.class);
+//System.out.println("mCurrentEmployee.getLunchPlaceId : "+mCurrentEmployee.getLunchPlaceId()+" - mPlaceId : "+mPlaceId);
+//                    if (mCurrentEmployee.getLunchPlace() != null && mCurrentEmployee.getLunchPlace() != "" && mCurrentEmployee.getLunchPlaceId() != mPlaceId)  {
+//                        mLunchPlaceToRemove = mCurrentEmployee.getLunchPlaceId();
+//                        System.out.println("CheckPreviousLunch : ancien lieu à effacer : "+mLunchPlaceToRemove);
+//                        RestaurantHelper.getRestaurant(mLunchPlaceToRemove).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+//                            @Override
+//                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+//                                Restaurant restaurant = documentSnapshot.toObject(Restaurant.class);
+//                                HashMap<String, String > lunchAttendees = restaurant.getLunchAttendees();
+//                                if (lunchAttendees != null && lunchAttendees.containsKey(mEmployeeName)) {
+//                                    lunchAttendees.remove(mEmployeeName);
+//                                }
+//                                RestaurantHelper.updateLunchAttendees(mPlaceId, lunchAttendees).addOnFailureListener(onFailureListener());
+//                            }
+//                        });
+//                    } else {
+//                        mLunchPlaceToRemove = null;
+//                        System.out.println("CheckPreviousLunch : même lieu ou rien à effacer");
+//                    }
+//
+//                }
+//            });
+//        }
+//        return mLunchPlaceToRemove;
+//    }
 
 }
 

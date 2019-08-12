@@ -18,8 +18,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.openclassrooms.go4lunch.R;
 import com.openclassrooms.go4lunch.api.EmployeeHelper;
+import com.openclassrooms.go4lunch.api.TeamHelper;
 
 import java.util.Arrays;
+import java.util.HashMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -146,8 +148,13 @@ public class MainActivity extends BaseActivity {
             String name = this.getCurrentUser().getDisplayName();
             String mail = this.getCurrentUser().getEmail();
             String urlPicture = (this.getCurrentUser().getPhotoUrl() != null) ? this.getCurrentUser().getPhotoUrl().toString() : null;
-            System.out.println("Infos employee : "+ uid +" - "+ name +" - "+ mail +" - "+ urlPicture +"...");
             EmployeeHelper.createEmployee(uid, name, mail, urlPicture, null, null,null).addOnFailureListener(this.onFailureListener());
+
+            String valueForTeam = (urlPicture == null) ? "Null___" : urlPicture+"___";
+            HashMap<String, String> lunchPlacesByEmployee = new HashMap<String, String>();
+            lunchPlacesByEmployee.put(name, valueForTeam);
+
+            TeamHelper.createTeam(lunchPlacesByEmployee).addOnFailureListener(this.onFailureListener());
         }
     }
 }
