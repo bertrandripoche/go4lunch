@@ -35,11 +35,9 @@ public class ListFragment extends Fragment {
 
     @OnClick(R.id.logout_button)
     public void onClickSignOutButton() {
-        System.out.println("CLIC");
         this.signOutUserFromFirebase(getActivity()); }
 
     private void signOutUserFromFirebase(Activity activity){
-        System.out.println("SIGN OUT");
         AuthUI.getInstance()
                 .signOut(activity)
                 .addOnSuccessListener(activity, this.updateUIAfterRESTRequestsCompleted(SIGN_OUT_TASK));

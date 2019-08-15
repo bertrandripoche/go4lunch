@@ -1,11 +1,9 @@
 package com.openclassrooms.go4lunch.controller.fragment;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.drawable.Drawable;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.Bundle;
 
@@ -21,7 +19,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -30,7 +27,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
@@ -46,6 +42,7 @@ import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.openclassrooms.go4lunch.R;
+import com.openclassrooms.go4lunch.api.RestaurantHelper;
 import com.openclassrooms.go4lunch.controller.activity.RestaurantActivity;
 
 import java.util.Arrays;
@@ -53,7 +50,7 @@ import java.util.List;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
-public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnCameraIdleListener, GoogleMap.OnMarkerClickListener {
+public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMarkerClickListener {
 
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private static final String TAG = "Map Fragment";
@@ -67,15 +64,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     private PlacesClient mPlacesClient;
 
-    private String[] mLikelyPlaceNames;
-    private String[] mLikelyPlaceAddresses;
-    private LatLng[] mLikelyPlaceLatLngs;
-
     private final LatLng mDefaultLocation = new LatLng(48.864716, 2.349014);
-    private static final int DEFAULT_ZOOM = 18;
+    private static final int DEFAULT_ZOOM = 19;
 
     public MapFragment() {
-        // Required empty public constructor
     }
 
     public static MapFragment newInstance() {
@@ -117,7 +109,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         mMap = googleMap;
 
         boolean success = googleMap.setMapStyle(new MapStyleOptions(getResources().getString(R.string.style_json)));
-
         if (!success) {
             Log.e(TAG, "Style parsing failed.");
         }
@@ -155,14 +146,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             }
         }
         updateLocationUI();
-    }
-
-    @Override
-    public void onCameraIdle() {
-        Toast.makeText(getActivity(), "The camera is moving.", Toast.LENGTH_SHORT).show();
-
-        double mylat = mMap.getCameraPosition().target.latitude;
-        double mylon = mMap.getCameraPosition().target.longitude;
     }
 
     private void moveCompassButton(View mapView) {
@@ -216,10 +199,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         try {
             if (mLocationPermissionGranted) {
                 mMap.setMyLocationEnabled(true);
-                //mMap.getUiSettings().setMyLocationButtonEnabled(true);
+                mMap.getUiSettings().setMyLocationButtonEnabled(true);
             } else {
                 mMap.setMyLocationEnabled(false);
-                //mMap.getUiSettings().setMyLocationButtonEnabled(false);
+                mMap.getUiSettings().setMyLocationButtonEnabled(false);
                 mLastKnownLocation = null;
                 getLocationPermission();
             }
@@ -258,15 +241,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         }
     }
 
-    private BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {
-        Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
-        vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
-        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        vectorDrawable.draw(canvas);
-        return BitmapDescriptorFactory.fromBitmap(bitmap);
-    }
-
     private void getRestaurants() {
         List<Place.Field> placeFields = Arrays.asList(Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG, Place.Field.TYPES, Place.Field.ID);
 
@@ -288,16 +262,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                                 if (currPlace.getTypes().contains(Place.Type.RESTAURANT)) {
                                     String mLikelyPlaceNames = currPlace.getName();
                                     LatLng mLikelyPlaceLatLngs = currPlace.getLatLng();
-//                                    System.out.println("Id du resto : "+currPlace.getId() + " - Position : "+currPlace.getLatLng());
 
-                                    String currLatLng = (mLikelyPlaceLatLngs == null) ?
-                                            "" : mLikelyPlaceLatLngs.toString();
+                                    String iconName = RestaurantHelper.isCurrentlyALunchPlace(currPlace.getId()) ? "ic_markers_restaurant_green" : "ic_markers_restaurant_red";
 
                                     mMap.addMarker(
-                                            new MarkerOptions()
-                                                    .position(new LatLng(mLikelyPlaceLatLngs.latitude, mLikelyPlaceLatLngs.longitude))
-                                                    .title(mLikelyPlaceNames)
-                                                    .icon(bitmapDescriptorFromVector(getContext(), R.drawable.ic_markers_restaurant_red))
+                                        new MarkerOptions()
+                                            .position(new LatLng(mLikelyPlaceLatLngs.latitude, mLikelyPlaceLatLngs.longitude))
+                                            .title(mLikelyPlaceNames)
+                                            .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons(iconName,150,150)))
                                     ).setTag(currPlace.getId());
                                 }
                             }
@@ -328,5 +300,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         startActivity(intent);
 
         return false;
+    }
+
+    public Bitmap resizeMapIcons(String iconName,int width, int height){
+        Bitmap imageBitmap = BitmapFactory.decodeResource(getResources(),getResources().getIdentifier(iconName, "drawable", getContext().getPackageName()));
+        Bitmap resizedBitmap = Bitmap.createScaledBitmap(imageBitmap, width, height, false);
+        return resizedBitmap;
     }
 }

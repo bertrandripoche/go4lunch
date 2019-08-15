@@ -1,17 +1,23 @@
 package com.openclassrooms.go4lunch.api;
 
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 import com.openclassrooms.go4lunch.model.Restaurant;
 
 import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
 
 public class RestaurantHelper {
     private static final String COLLECTION_NAME = "restaurants";
+    private static boolean mIsCurrentlyALunchPlace;
 
     // --- COLLECTION REFERENCE ---
 
@@ -21,9 +27,11 @@ public class RestaurantHelper {
 
     // --- CREATE ---
 
-    public static Task<Void> createRestaurant(String id, String name, HashMap<String, String> likes, HashMap<String, String> lunchAttendees) {
-        Restaurant restaurantToCreate = new Restaurant(id, name, likes, lunchAttendees);
-        return RestaurantHelper.getRestaurantsCollection().document(id).set(restaurantToCreate);
+    public static Task<Void> createRestaurant(String id, String name) {
+//        Restaurant restaurantToCreate = new Restaurant(name);
+        Map<String, Object> restaurantToCreate = new HashMap<>();
+        restaurantToCreate.put("name", name);
+        return RestaurantHelper.getRestaurantsCollection().document(id).set(restaurantToCreate, SetOptions.merge());
     }
 
     // --- GET ---
@@ -34,29 +42,46 @@ public class RestaurantHelper {
 
     // --- UPDATE ---
 
-    public static Task<Void> updateName(String id, String name) {
-        return RestaurantHelper.getRestaurantsCollection().document(id).update("name", name);
+    public static Task<Void> updateLikes(String id, String employeeId, HashMap<String, String> employeeInfo) {
+        return RestaurantHelper.getRestaurantsCollection().document(id).update("likes."+employeeId, employeeInfo);
     }
 
-    public static Task<Void> updateLikes(String id, HashMap<String, String> likes) {
-        return RestaurantHelper.getRestaurantsCollection().document(id).update("likes", likes);
-    }
-
-    public static Task<Void> updateLunchAttendees(String id, HashMap<String, String> lunchAttendees) {
-        return RestaurantHelper.getRestaurantsCollection().document(id).update("lunchAttendees", lunchAttendees);
+    public static Task<Void> updateLunchAttendees(String id, String employeeId, HashMap<String, String> employeeInfo) {
+        return RestaurantHelper.getRestaurantsCollection().document(id).update("lunchAttendees."+employeeId, employeeInfo);
     }
 
     // --- DELETE ---
 
-    public static Task<Void> deleteRestaurant(String id) {
-        return RestaurantHelper.getRestaurantsCollection().document(id).delete();
+    public static Task<Void> deleteLunchPlaces(String id, String employeeId) {
+        return RestaurantHelper.getRestaurantsCollection().document(id).update("lunchAttendees."+employeeId, FieldValue.delete());
     }
 
-    public static Task<Void> deleteLunchPlaces(String id) {
-        return RestaurantHelper.getRestaurantsCollection().document(id).update("lunchAttendees", null);
+    public static Task<Void> deleteLikes(String id, String employeeId) {
+        return RestaurantHelper.getRestaurantsCollection().document(id).update("likes."+employeeId, FieldValue.delete());
     }
 
-    public static Task<Void> deleteLikes(String uid) {
-        return RestaurantHelper.getRestaurantsCollection().document(uid).update("likes", null);
+    public static boolean isCurrentlyALunchPlace(String id) {
+        DocumentReference restaurantDoc = getRestaurantsCollection().document(id);
+        mIsCurrentlyALunchPlace = false;
+
+        restaurantDoc.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Restaurant restaurant = document.toObject(Restaurant.class);
+                        HashMap<String, HashMap<String,String>> lunchAttendees = restaurant.getLunchAttendees();
+                        System.out.println("Lunch Attendees : "+lunchAttendees);
+                        if (lunchAttendees != null && !lunchAttendees.isEmpty()) {
+                            mIsCurrentlyALunchPlace = true;
+                            System.out.println("Lunch Attendees now : "+lunchAttendees);
+                        }
+                    }
+                }
+            }
+        });
+        System.out.println("mIsCurrentlyALunchPlace"+mIsCurrentlyALunchPlace);
+        return mIsCurrentlyALunchPlace;
     }
 }

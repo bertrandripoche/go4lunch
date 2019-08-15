@@ -6,7 +6,6 @@ import java.util.HashMap;
 
 public class Employee {
 
-    private String uid;
     private String name;
     private String mail;
     @Nullable
@@ -21,8 +20,12 @@ public class Employee {
 
     public Employee() { }
 
-    public Employee(String uid, String name, String mail, @Nullable String urlPicture, @Nullable String lunchPlace, @Nullable String lunchPlaceId, @Nullable HashMap<String, String> likedPlaces) {
-        this.uid = uid;
+    public Employee(String name, String urlPicture) {
+        this.name = name;
+        this.urlPicture = urlPicture;
+    }
+
+    public Employee(String name, String mail, @Nullable String urlPicture, @Nullable String lunchPlace, @Nullable String lunchPlaceId, @Nullable HashMap<String, String> likedPlaces) {
         this.name = name;
         this.mail = mail;
         this.urlPicture = urlPicture;
@@ -32,7 +35,6 @@ public class Employee {
     }
 
     // --- GETTERS ---
-    public String getUid() {return uid;}
     public String getName() {return name;}
     public String getMail() {return mail;}
     @Nullable
@@ -47,7 +49,6 @@ public class Employee {
     public void setLunchPlace(String lunchPlace) {this.lunchPlace = lunchPlace;}
     public void setLunchPlaceId(String lunchPlaceId) {this.lunchPlaceId = lunchPlaceId;}
     public void setLikedPlaces(HashMap<String, String> likedPlaces) {this.likedPlaces = likedPlaces;}
-    public void setUid(String uid) { this.uid = uid; }
     public void setUrlPicture(String urlPicture) { this.urlPicture = urlPicture; }
 
 }

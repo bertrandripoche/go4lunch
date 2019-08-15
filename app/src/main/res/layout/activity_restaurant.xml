@@ -7,9 +7,14 @@
     android:background="@color/white"
     android:layout_margin="0dp">
 
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
         <androidx.appcompat.widget.AppCompatImageView
@@ -98,6 +103,7 @@
                 android:gravity="center"
                 android:drawableTop="@drawable/ic_web"
                 android:background="@color/white"/>
+
         </LinearLayout>
 
         <View
@@ -105,6 +111,21 @@
             android:layout_width="match_parent"
             android:background="@color/light_grey"/>
     </LinearLayout>
+
+
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:orientation="vertical"-->
+        <!--android:background="@color/light_grey"-->
+        <!--&gt;-->
+        <!--<android.support.v7.widget.RecyclerView-->
+            <!--android:id="@+id/activity_restaurant_recycler_view"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent" />-->
+    <!--</LinearLayout>-->
+
+</LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/mBtnLunch"
@@ -120,4 +141,5 @@
         app:layout_anchor="@id/restaurant_activity_pic"
         app:layout_anchorGravity="bottom|right|end"
         app:maxImageSize="50dp" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

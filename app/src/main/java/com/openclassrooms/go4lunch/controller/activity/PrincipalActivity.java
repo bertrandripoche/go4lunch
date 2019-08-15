@@ -95,6 +95,7 @@ public class PrincipalActivity extends BaseActivity implements NavigationView.On
 
                 if (this.getCurrentUser() != null){
                     String mEmployeeUid = this.getCurrentUser().getUid();
+
                     EmployeeHelper.getEmployee(mEmployeeUid).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                         @Override
                         public void onSuccess(DocumentSnapshot documentSnapshot) {
@@ -109,9 +110,6 @@ public class PrincipalActivity extends BaseActivity implements NavigationView.On
                                 intent.putExtras(bundle);
                                 startActivity(intent);
                             } else {
-//                                Menu menuNav=navigationView.getMenu();
-//                                MenuItem yourLunch = menuNav.findItem(R.id.activity_main_drawer_lunch);
-//                                yourLunch.setEnabled(false);
                                 Toast.makeText(getApplicationContext(),R.string.no_lunch_defined,Toast.LENGTH_LONG).show();
                             }
                         }

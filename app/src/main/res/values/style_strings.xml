@@ -12,7 +12,9 @@
       ]
     },
     {
-      \"featureType\": \"transit\",
+      <!--\"featureType\": \"transit\",-->
+        \"featureType\": \"administrative.land_parcel\",
+
       \"elementType\": \"labels.icon\",
       \"stylers\": [
         {

@@ -23,7 +23,7 @@ public class EmployeeHelper {
     // --- CREATE ---
 
     public static Task<Void> createEmployee(String uid, String name, String mail, String urlPicture, String lunchPlace, String lunchPlaceId, HashMap<String, String> likedPlaces) {
-        Employee employeeToCreate = new Employee(uid, name, mail, urlPicture, lunchPlace, lunchPlaceId, likedPlaces);
+        Employee employeeToCreate = new Employee(name, mail, urlPicture, lunchPlace, lunchPlaceId, likedPlaces);
         return EmployeeHelper.getEmployeesCollection().document(uid).set(employeeToCreate);
     }
 
@@ -35,14 +35,6 @@ public class EmployeeHelper {
 
     // --- UPDATE ---
 
-    public static Task<Void> updateName(String name, String uid) {
-        return EmployeeHelper.getEmployeesCollection().document(uid).update("name", name);
-    }
-
-    public static Task<Void> updateMail(String uid, String mail) {
-        return EmployeeHelper.getEmployeesCollection().document(uid).update("mail", mail);
-    }
-
     public static Task<Void> updateLunchPlace(String uid, String lunchPlace) {
         return EmployeeHelper.getEmployeesCollection().document(uid).update("lunchPlace", lunchPlace);
     }
@@ -51,21 +43,13 @@ public class EmployeeHelper {
         return EmployeeHelper.getEmployeesCollection().document(uid).update("lunchPlaceId", lunchPlaceId);
     }
 
-    public static Task<Void> updateLikedPlaces(String uid, HashMap<String, String> likedPlaces) {
-        return EmployeeHelper.getEmployeesCollection().document(uid).update("likedPlaces", likedPlaces);
+    public static Task<Void> updateLikedPlaces(String uid, String restaurantId, String restaurantName) {
+        return EmployeeHelper.getEmployeesCollection().document(uid).update("likedPlaces."+restaurantId, restaurantName);
     }
 
     // --- DELETE ---
 
-    public static Task<Void> deleteEmployee(String uid) {
-        return EmployeeHelper.getEmployeesCollection().document(uid).delete();
-    }
-
-    public static Task<Void> deleteLunchPlaces(String uid) {
-        return EmployeeHelper.getEmployeesCollection().document(uid).update("lunchPlace", FieldValue.delete());
-    }
-
-    public static Task<Void> deleteLikedPlaces(String uid) {
-        return EmployeeHelper.getEmployeesCollection().document(uid).update("likedPlaces", FieldValue.delete());
+    public static Task<Void> deleteLikedPlaces(String uid, String restaurantId) {
+        return EmployeeHelper.getEmployeesCollection().document(uid).update("likedPlaces."+restaurantId, FieldValue.delete());
     }
 }

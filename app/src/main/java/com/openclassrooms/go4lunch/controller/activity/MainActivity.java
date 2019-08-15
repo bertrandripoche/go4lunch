@@ -1,5 +1,6 @@
 package com.openclassrooms.go4lunch.controller.activity;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
@@ -12,13 +13,16 @@ import android.widget.Button;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.IdpResponse;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.openclassrooms.go4lunch.R;
 import com.openclassrooms.go4lunch.api.EmployeeHelper;
 import com.openclassrooms.go4lunch.api.TeamHelper;
+import com.openclassrooms.go4lunch.model.Team;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -150,11 +154,30 @@ public class MainActivity extends BaseActivity {
             String urlPicture = (this.getCurrentUser().getPhotoUrl() != null) ? this.getCurrentUser().getPhotoUrl().toString() : null;
             EmployeeHelper.createEmployee(uid, name, mail, urlPicture, null, null,null).addOnFailureListener(this.onFailureListener());
 
-            String valueForTeam = (urlPicture == null) ? "Null___" : urlPicture+"___";
-            HashMap<String, String> lunchPlacesByEmployee = new HashMap<String, String>();
-            lunchPlacesByEmployee.put(name, valueForTeam);
-
-            TeamHelper.createTeam(lunchPlacesByEmployee).addOnFailureListener(this.onFailureListener());
+//            TeamHelper.getTeam().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+//                @Override
+//                public void onSuccess(DocumentSnapshot documentSnapshot) {
+//                    Team team = documentSnapshot.toObject(Team.class);
+//                    String valueForTeam = (urlPicture == null) ? name + "___Null___" : name + "___" + urlPicture + "___";
+//
+//                    if (team == null) {
+//                        HashMap<String, String > lunchPlaceByEmployee = new HashMap<String, String>();
+//                        System.out.println("Trouvé mais vide");
+//                        lunchPlaceByEmployee.put(uid, valueForTeam);
+//                        TeamHelper.createTeam(lunchPlaceByEmployee).addOnFailureListener(onFailureListener());
+//                    } else {
+//                        HashMap<String, String > lunchPlaceByEmployee = team.getLunchPlaceByEmployee();
+//                        System.out.println("Trouvé mais pleine");
+//                        lunchPlaceByEmployee.put(uid, valueForTeam);
+//                        TeamHelper.updateLunchPlaceByEmployee(lunchPlaceByEmployee);
+//                    }
+//                }
+//            }).addOnFailureListener(new OnFailureListener() {
+//                @Override
+//                public void onFailure(@NonNull Exception e) {
+//                    System.out.println("Rien trouvé");
+//                }
+//            });
         }
     }
 }
