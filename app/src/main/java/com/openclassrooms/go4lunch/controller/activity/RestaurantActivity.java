@@ -101,8 +101,6 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
         getEmployeeInfo();
         getPlaceInfo(mPlaceId);
 
-
-
         //this.configureRecyclerView();
     }
 

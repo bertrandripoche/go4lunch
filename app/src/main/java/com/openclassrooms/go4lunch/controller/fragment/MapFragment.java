@@ -42,7 +42,6 @@ import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.openclassrooms.go4lunch.R;
-import com.openclassrooms.go4lunch.api.RestaurantHelper;
 import com.openclassrooms.go4lunch.controller.activity.RestaurantActivity;
 
 import java.util.Arrays;
@@ -63,6 +62,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private LatLng mLatLngLastKnownLocation;
 
     private PlacesClient mPlacesClient;
+    private List<String> mLunchPlaces;
 
     private final LatLng mDefaultLocation = new LatLng(48.864716, 2.349014);
     private static final int DEFAULT_ZOOM = 19;
@@ -83,7 +83,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         Places.initialize(getContext(), getString(R.string.google_maps_key));
         mPlacesClient = Places.createClient(getContext());
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
-
     }
 
     @Override
@@ -199,10 +198,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         try {
             if (mLocationPermissionGranted) {
                 mMap.setMyLocationEnabled(true);
-                mMap.getUiSettings().setMyLocationButtonEnabled(true);
+                //mMap.getUiSettings().setMyLocationButtonEnabled(true);
             } else {
                 mMap.setMyLocationEnabled(false);
-                mMap.getUiSettings().setMyLocationButtonEnabled(false);
+                //mMap.getUiSettings().setMyLocationButtonEnabled(false);
                 mLastKnownLocation = null;
                 getLocationPermission();
             }
@@ -258,12 +257,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
                             for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
                                 Place currPlace = placeLikelihood.getPlace();
+                                String iconName = "ic_markers_restaurant_red";
 
                                 if (currPlace.getTypes().contains(Place.Type.RESTAURANT)) {
                                     String mLikelyPlaceNames = currPlace.getName();
                                     LatLng mLikelyPlaceLatLngs = currPlace.getLatLng();
-
-                                    String iconName = RestaurantHelper.isCurrentlyALunchPlace(currPlace.getId()) ? "ic_markers_restaurant_green" : "ic_markers_restaurant_red";
 
                                     mMap.addMarker(
                                         new MarkerOptions()
@@ -281,6 +279,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                             }
                         }
                     }
+
                 });
         } else {
             getLocationPermission();
