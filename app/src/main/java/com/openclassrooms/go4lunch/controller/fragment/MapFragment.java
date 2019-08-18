@@ -219,7 +219,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                     public void onComplete(@NonNull Task<Location> task) {
                         if (task.isSuccessful()) {
                             Log.d(TAG, "Location successful.");
-                            // Set the map's camera position to the current location of the device.
                             mLastKnownLocation = task.getResult();
                             mLatLngLastKnownLocation =  new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
                             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mLatLngLastKnownLocation, DEFAULT_ZOOM));
