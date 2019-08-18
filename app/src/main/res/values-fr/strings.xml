@@ -45,5 +45,9 @@
         <string name="restaurant_name">Nom du restaurant</string>
         <string name="no_phone_available">Pas de téléphone référencé</string>
         <string name="no_lunch_defined">Aucun restaurant choisi</string>
+        <string name="restaurant_image">Image Restaurant</string>
+        <string name="is_eating_here"> mange ici.</string>
+        <string name="is_eating_at"> mange chez </string>
+        <string name="not_decided_yet"> n\'a pas encore choisi.</string>
 
 </resources>

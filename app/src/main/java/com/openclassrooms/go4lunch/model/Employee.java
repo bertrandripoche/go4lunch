@@ -17,12 +17,15 @@ public class Employee {
     @Nullable
     private HashMap<String, String> likedPlaces;
 
-
     public Employee() { }
 
-    public Employee(String name, String urlPicture) {
+    public Employee(String name, String mail, String urlPicture) {
         this.name = name;
         this.urlPicture = urlPicture;
+        this.mail = mail;
+        this.lunchPlace = null;
+        this.lunchPlaceId = null;
+        this.likedPlaces = null;
     }
 
     public Employee(String name, String mail, @Nullable String urlPicture, @Nullable String lunchPlace, @Nullable String lunchPlaceId, @Nullable HashMap<String, String> likedPlaces) {
@@ -44,11 +47,8 @@ public class Employee {
     public  HashMap<String, String>  getLikedPlaces() {return likedPlaces;}
 
     // --- SETTERS ---
-    public void setName(String name) {this.name = name;}
-    public void setMail(String mail) {this.mail = mail;}
     public void setLunchPlace(String lunchPlace) {this.lunchPlace = lunchPlace;}
     public void setLunchPlaceId(String lunchPlaceId) {this.lunchPlaceId = lunchPlaceId;}
     public void setLikedPlaces(HashMap<String, String> likedPlaces) {this.likedPlaces = likedPlaces;}
-    public void setUrlPicture(String urlPicture) { this.urlPicture = urlPicture; }
 
 }

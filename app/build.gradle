@@ -39,11 +39,10 @@ dependencies {
     //FIREBASE
     implementation 'com.google.firebase:firebase-core:17.0.0'
     implementation 'com.google.firebase:firebase-auth:18.1.0'
-
-
-    //FIRESTORE
     implementation 'com.firebaseui:firebase-ui-storage:5.0.0'
     implementation 'com.firebaseui:firebase-ui-auth:5.0.0'
+
+    //FIRESTORE
     implementation 'com.firebaseui:firebase-ui-firestore:5.0.0'
 
     //GOOGLE

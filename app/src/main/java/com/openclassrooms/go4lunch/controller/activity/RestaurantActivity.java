@@ -10,14 +10,10 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.PhotoMetadata;
@@ -26,30 +22,20 @@ import com.google.android.libraries.places.api.net.FetchPhotoRequest;
 import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.Transaction;
-import com.google.firebase.firestore.WriteBatch;
+import com.google.firebase.firestore.Query;
 import com.openclassrooms.go4lunch.R;
 import com.openclassrooms.go4lunch.api.EmployeeHelper;
 import com.openclassrooms.go4lunch.api.RestaurantHelper;
-import com.openclassrooms.go4lunch.api.TeamHelper;
 import com.openclassrooms.go4lunch.model.Employee;
-import com.openclassrooms.go4lunch.model.Restaurant;
-import com.openclassrooms.go4lunch.model.Team;
 import com.openclassrooms.go4lunch.view.RestaurantAttendeesAdapter;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ScheduledExecutorService;
-
-import butterknife.BindView;
 
 public class RestaurantActivity extends BaseActivity implements View.OnClickListener {
 
@@ -72,6 +58,9 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
     private static boolean sLunchOn = false;
     private Employee mCurrentEmployee;
     private List<Employee> mEmployeeList;
+
+    private FirebaseFirestore mDb = FirebaseFirestore.getInstance();
+    private CollectionReference mRestaurantRef = mDb.collection("restaurants");
     private RestaurantAttendeesAdapter mAdapter;
 
     final String PLACE_ID = "placeId";
@@ -101,7 +90,7 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
         getEmployeeInfo();
         getPlaceInfo(mPlaceId);
 
-        //this.configureRecyclerView();
+        configureRecyclerView();
     }
 
     @Override
@@ -157,13 +146,10 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
         }
     }
 
-//    private void configureRecyclerView() {
-//        this.mEmployeeList = new ArrayList<>();
-//
-//        this.mAdapter = new RestaurantAttendeesAdapter(this.mEmployeeList);
-//        this.recyclerView.setAdapter(this.mAdapter);
-//        this.recyclerView.setLayoutManager(new LinearLayoutManager(this));
-//    }
+    private void configureRecyclerView() {
+
+
+    }
 
     private void getEmployeeInfo() {
         if (this.getCurrentUser() != null){
