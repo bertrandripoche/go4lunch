@@ -3,13 +3,12 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_gravity="center"
-    android:background="@color/orange">
+    android:layout_gravity="center">
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/logout_button"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/fragment_list_recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Déconnexion"/>
+        android:layout_height="match_parent">
+    </androidx.recyclerview.widget.RecyclerView>
 
 </LinearLayout>

@@ -22,7 +22,6 @@ public class WorkmatesAdapter extends FirestoreRecyclerAdapter<Employee, Workmat
         super(options);
     }
 
-    @SuppressLint("ResourceAsColor")
     @Override
     protected void onBindViewHolder(@NonNull WorkmatesViewHolder workmatesViewHolder, int i, @NonNull Employee employee) {
         Resources resources = workmatesViewHolder.itemView.getContext().getResources();
@@ -39,11 +38,13 @@ public class WorkmatesAdapter extends FirestoreRecyclerAdapter<Employee, Workmat
             if (employee.getLunchPlace() != null && !employee.getLunchPlace().equals("")) {
                 employeeDescription = firstName + resources.getString(R.string.is_eating_at) + " \"" + employee.getLunchPlace() +"\"";
                 workmatesViewHolder.mEmployeeDescription.setText(employeeDescription);
+                workmatesViewHolder.mEmployeeDescription.setTag(employee.getLunchPlaceId());
             } else {
                 employeeDescription = firstName + resources.getString(R.string.not_decided_yet);
                 workmatesViewHolder.mEmployeeDescription.setText(employeeDescription);
                 workmatesViewHolder.mEmployeeDescription.setTextColor(resources.getColor(R.color.quantum_grey500));
                 workmatesViewHolder.mEmployeeDescription.setTypeface(null,Typeface.ITALIC);
+                workmatesViewHolder.mEmployeeDescription.setTag("null");
             }
         }
 
@@ -55,4 +56,5 @@ public class WorkmatesAdapter extends FirestoreRecyclerAdapter<Employee, Workmat
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_view_employee_item, parent, false);
         return new WorkmatesViewHolder(v);
     }
+
 }

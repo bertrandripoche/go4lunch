@@ -1,10 +1,14 @@
 package com.openclassrooms.go4lunch.controller.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -18,8 +22,11 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.openclassrooms.go4lunch.R;
+import com.openclassrooms.go4lunch.controller.activity.RestaurantActivity;
 import com.openclassrooms.go4lunch.model.Employee;
+import com.openclassrooms.go4lunch.utils.ItemClickSupport;
 import com.openclassrooms.go4lunch.view.WorkmatesAdapter;
+import com.openclassrooms.go4lunch.view.WorkmatesViewHolder;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -32,7 +39,7 @@ public class WorkmatesFragment extends Fragment {
     private CollectionReference mWorkmatesRef = db.collection("employees");
 
     private WorkmatesAdapter mAdapter;
-
+    private TextView mEmployeeDescription;
     private static final int SIGN_OUT_TASK = 10;
     private static final int DELETE_USER_TASK = 20;
 
@@ -43,6 +50,7 @@ public class WorkmatesFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_workmates, container, false);
         ButterKnife.bind(this, view);
         configureRecyclerView();
+        configureOnClickRecyclerView();
         return view;
     }
 
@@ -55,10 +63,32 @@ public class WorkmatesFragment extends Fragment {
 
         mAdapter = new WorkmatesAdapter(options);
 
-
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setAdapter(mAdapter);
+    }
+
+    void configureOnClickRecyclerView(){
+        ItemClickSupport.addTo(mRecyclerView, R.layout.recycler_view_employee_item)
+            .setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
+                @Override
+                public void onItemClicked(RecyclerView recyclerView, int position, View v) {
+                    final String PLACE_ID = "placeId";
+                    mEmployeeDescription = v.findViewById(R.id.employee_description);
+                    String lunchPlaceId = (String) mEmployeeDescription.getTag();
+
+                    if (lunchPlaceId != null && lunchPlaceId != "null") {
+                        Bundle bundle = new Bundle();
+                        bundle.putString(PLACE_ID, lunchPlaceId);
+
+                        Intent intent = new Intent(v.getContext(), RestaurantActivity.class);
+                        intent.putExtras(bundle);
+                        startActivity(intent);
+                    } else {
+                        Toast.makeText(v.getContext(),R.string.no_lunch_defined,Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
     }
 
     @Override

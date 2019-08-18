@@ -19,10 +19,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class ListFragment extends Fragment {
-    @BindView(R.id.logout_button) AppCompatButton logoutButton;
 
-    private static final int SIGN_OUT_TASK = 10;
-    private static final int DELETE_USER_TASK = 20;
 
     public ListFragment() {}
 
@@ -33,32 +30,4 @@ public class ListFragment extends Fragment {
         return view;
     }
 
-    @OnClick(R.id.logout_button)
-    public void onClickSignOutButton() {
-        this.signOutUserFromFirebase(getActivity()); }
-
-    private void signOutUserFromFirebase(Activity activity){
-        AuthUI.getInstance()
-                .signOut(activity)
-                .addOnSuccessListener(activity, this.updateUIAfterRESTRequestsCompleted(SIGN_OUT_TASK));
-    }
-
-    private OnSuccessListener<Void> updateUIAfterRESTRequestsCompleted(final int origin){
-        return new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                switch (origin){
-                    case SIGN_OUT_TASK:
-                        System.out.println("DECONNEXION");
-                        getActivity().finish();
-                        break;
-                    case DELETE_USER_TASK:
-                        getActivity().finish();
-                        break;
-                    default:
-                        break;
-                }
-            }
-        };
-    }
 }
