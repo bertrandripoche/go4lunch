@@ -47,7 +47,8 @@
         <string name="no_lunch_defined">Aucun restaurant choisi</string>
         <string name="restaurant_image">Image Restaurant</string>
         <string name="is_eating_here"> mange ici.</string>
-        <string name="is_eating_at"> mange chez </string>
+        <string name="eats_at"> mange chez </string>
         <string name="not_decided_yet"> n\'a pas encore choisi.</string>
-
+        <string name="you_did_not_decide_yet">Vous n\'avez pas encore choisi.</string>
+        <string name="you_eat_at">Vous mangez chez</string>
 </resources>

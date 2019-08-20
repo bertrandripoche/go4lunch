@@ -1,6 +1,5 @@
 package com.openclassrooms.go4lunch.view;
 
-import android.annotation.SuppressLint;
 import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -15,6 +14,7 @@ import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.openclassrooms.go4lunch.R;
 import com.openclassrooms.go4lunch.model.Employee;
+import com.openclassrooms.go4lunch.utils.FirebaseUserManagement;
 
 public class WorkmatesAdapter extends FirestoreRecyclerAdapter<Employee, WorkmatesViewHolder> {
 
@@ -33,21 +33,33 @@ public class WorkmatesAdapter extends FirestoreRecyclerAdapter<Employee, Workmat
                 .into(workmatesViewHolder.mEmployeePic);
 
         String firstName = employee.getName().split(" ")[0] + " ";
+
+        String currentUser = FirebaseUserManagement.getCurrentUser().getUid();
+        boolean isCurrentUser = currentUser.equals(employee.getUid());
+
         String employeeDescription;
-        if (employee != null) {
-            if (employee.getLunchPlace() != null && !employee.getLunchPlace().equals("")) {
-                employeeDescription = firstName + resources.getString(R.string.is_eating_at) + " \"" + employee.getLunchPlace() +"\"";
-                workmatesViewHolder.mEmployeeDescription.setText(employeeDescription);
-                workmatesViewHolder.mEmployeeDescription.setTag(employee.getLunchPlaceId());
+
+        if (employee.getLunchPlace() != null && !employee.getLunchPlace().equals("")) {
+            employeeDescription = (isCurrentUser) ? resources.getString(R.string.you_eat_at) + " \"" + employee.getLunchPlace() + "\"" : firstName + resources.getString(R.string.eats_at) + " \"" + employee.getLunchPlace() + "\"";
+            workmatesViewHolder.mEmployeeDescription.setText(employeeDescription);
+            workmatesViewHolder.mEmployeeDescription.setTag(employee.getLunchPlaceId());
+            if ((isCurrentUser)) {
+                workmatesViewHolder.mEmployeeDescription.setTextColor(resources.getColor(R.color.colorPrimaryDark));
+                workmatesViewHolder.mEmployeeDescription.setTypeface(null, Typeface.BOLD);
+            }
+        } else {
+            employeeDescription = (isCurrentUser) ? resources.getString(R.string.you_did_not_decide_yet) : firstName + resources.getString(R.string.not_decided_yet);
+            workmatesViewHolder.mEmployeeDescription.setText(employeeDescription);
+
+            workmatesViewHolder.mEmployeeDescription.setTag("null");
+            if ((isCurrentUser)) {
+                workmatesViewHolder.mEmployeeDescription.setTextColor(resources.getColor(R.color.colorPrimaryDark));
+                workmatesViewHolder.mEmployeeDescription.setTypeface(null, Typeface.BOLD);
             } else {
-                employeeDescription = firstName + resources.getString(R.string.not_decided_yet);
-                workmatesViewHolder.mEmployeeDescription.setText(employeeDescription);
                 workmatesViewHolder.mEmployeeDescription.setTextColor(resources.getColor(R.color.quantum_grey500));
-                workmatesViewHolder.mEmployeeDescription.setTypeface(null,Typeface.ITALIC);
-                workmatesViewHolder.mEmployeeDescription.setTag("null");
+                workmatesViewHolder.mEmployeeDescription.setTypeface(null, Typeface.ITALIC);
             }
         }
-
     }
 
     @NonNull

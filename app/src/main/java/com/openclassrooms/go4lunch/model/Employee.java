@@ -6,6 +6,7 @@ import java.util.HashMap;
 
 public class Employee {
 
+    private String uid;
     private String name;
     private String mail;
     @Nullable
@@ -19,7 +20,8 @@ public class Employee {
 
     public Employee() { }
 
-    public Employee(String name, String mail, String urlPicture) {
+    public Employee(String uid, String name, String mail, String urlPicture) {
+        this.uid = uid;
         this.name = name;
         this.urlPicture = urlPicture;
         this.mail = mail;
@@ -28,7 +30,8 @@ public class Employee {
         this.likedPlaces = null;
     }
 
-    public Employee(String name, String mail, @Nullable String urlPicture, @Nullable String lunchPlace, @Nullable String lunchPlaceId, @Nullable HashMap<String, String> likedPlaces) {
+    public Employee(String uid, String name, String mail, @Nullable String urlPicture, @Nullable String lunchPlace, @Nullable String lunchPlaceId, @Nullable HashMap<String, String> likedPlaces) {
+        this.uid = uid;
         this.name = name;
         this.mail = mail;
         this.urlPicture = urlPicture;
@@ -38,6 +41,8 @@ public class Employee {
     }
 
     // --- GETTERS ---
+
+    public String getUid() {return uid;}
     public String getName() {return name;}
     public String getMail() {return mail;}
     @Nullable

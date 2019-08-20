@@ -16,8 +16,8 @@ public class WorkmatesViewHolder extends RecyclerView.ViewHolder {
     public WorkmatesViewHolder(@NonNull View itemView) {
         super(itemView);
 
-        mEmployeePic = itemView.findViewById(R.id.employee_pic);
-        mEmployeeDescription = itemView.findViewById(R.id.employee_description);
+        mEmployeePic = itemView.findViewById(R.id.item_employee_pic);
+        mEmployeeDescription = itemView.findViewById(R.id.item_employee_description);
 
     }
 }

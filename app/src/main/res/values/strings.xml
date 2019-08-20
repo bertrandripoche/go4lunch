@@ -46,7 +46,9 @@
     <string name="no_lunch_defined">No lunch place defined</string>
     <string name="restaurant_image">Restaurant Image</string>
     <string name="is_eating_here"> is eating here.</string>
-    <string name="is_eating_at"> eats at </string>
+    <string name="eats_at"> eats at </string>
     <string name="not_decided_yet"> didn\'t decide yet.</string>
+    <string name="you_did_not_decide_yet">You didn\'t decide yet.</string>
+    <string name="you_eat_at">You eat at</string>
 
 </resources>

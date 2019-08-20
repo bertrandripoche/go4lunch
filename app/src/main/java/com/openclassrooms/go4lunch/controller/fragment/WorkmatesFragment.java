@@ -74,7 +74,7 @@ public class WorkmatesFragment extends Fragment {
                 @Override
                 public void onItemClicked(RecyclerView recyclerView, int position, View v) {
                     final String PLACE_ID = "placeId";
-                    mEmployeeDescription = v.findViewById(R.id.employee_description);
+                    mEmployeeDescription = v.findViewById(R.id.item_employee_description);
                     String lunchPlaceId = (String) mEmployeeDescription.getTag();
 
                     if (lunchPlaceId != null && lunchPlaceId != "null") {
@@ -103,29 +103,4 @@ public class WorkmatesFragment extends Fragment {
         mAdapter.stopListening();
     }
 
-    private void signOutUserFromFirebase(){
-        System.out.println("SIGN OUT");
-        AuthUI.getInstance()
-                .signOut(getActivity())
-                .addOnSuccessListener(getActivity(), this.updateUIAfterRESTRequestsCompleted(SIGN_OUT_TASK));
-    }
-
-    private OnSuccessListener<Void> updateUIAfterRESTRequestsCompleted(final int origin){
-        return new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                switch (origin){
-                    case SIGN_OUT_TASK:
-                        System.out.println("DECONNEXION");
-                        getActivity().finish();
-                        break;
-                    case DELETE_USER_TASK:
-                        getActivity().finish();
-                        break;
-                    default:
-                        break;
-                }
-            }
-        };
-    }
 }

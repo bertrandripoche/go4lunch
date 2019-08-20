@@ -10,11 +10,14 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
 
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
@@ -23,9 +26,11 @@ import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.WriteBatch;
 import com.openclassrooms.go4lunch.R;
 import com.openclassrooms.go4lunch.api.EmployeeHelper;
 import com.openclassrooms.go4lunch.api.RestaurantHelper;
@@ -236,21 +241,43 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
 
     private void addLikeInFirestore(){
         if (this.getCurrentUser() != null){
-            EmployeeHelper.updateLikedPlaces(mEmployeeUid, mPlaceId, mPlace.getName());
+            //EmployeeHelper.updateLikedPlaces(mEmployeeUid, mPlaceId, mPlace.getName());
 
             HashMap<String, String> employeeInfo = new HashMap<String, String>();
             employeeInfo.put("name", mEmployeeName);
             employeeInfo.put("urlPic", mEmployeePic);
-            RestaurantHelper.updateLikes(mPlaceId, mEmployeeUid, employeeInfo);
+            //RestaurantHelper.updateLikes(mPlaceId, mEmployeeUid, employeeInfo);
+
+            WriteBatch batch = mDb.batch();
+            DocumentReference employeeRef = mDb.collection("employees").document(mEmployeeUid);
+            DocumentReference restaurantRef = mDb.collection("restaurants").document(mPlaceId);
+
+            batch.update(employeeRef, "likedPlaces."+mPlaceId, mPlace.getName());
+            batch.update(restaurantRef, "likes."+mEmployeeUid, employeeInfo);
+            batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    Log.i(TAG, "Batched addLike done");
+                }
+            });
 
         }
     }
 
     private void removeLikeInFirestore() {
         if (this.getCurrentUser() != null){
-            EmployeeHelper.deleteLikedPlaces(mEmployeeUid, mPlaceId);
-            RestaurantHelper.deleteLikes(mPlaceId, mEmployeeUid);
+            WriteBatch batch = mDb.batch();
+            DocumentReference employeeRef = mDb.collection("employees").document(mEmployeeUid);
+            DocumentReference restaurantRef = mDb.collection("restaurants").document(mPlaceId);
 
+            batch.update(employeeRef, "likedPlaces."+mPlaceId, FieldValue.delete());
+            batch.update(restaurantRef, "likes."+mEmployeeUid, FieldValue.delete());
+            batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    Log.i(TAG, "Batched removeLike done");
+                }
+            });
         }
     }
 
@@ -259,25 +286,46 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
             String lunchRestaurant = mPlace.getName();
             String lunchRestaurantId = mPlace.getId();
 
-            EmployeeHelper.updateLunchPlace(mEmployeeUid, lunchRestaurant).addOnFailureListener(this.onFailureListener());
-            EmployeeHelper.updateLunchPlaceId(mEmployeeUid, lunchRestaurantId).addOnFailureListener(this.onFailureListener());
-
             HashMap<String, String> employeeInfo = new HashMap<String, String>();
             employeeInfo.put("name", mEmployeeName);
             employeeInfo.put("urlPic", mEmployeePic);
-            RestaurantHelper.updateLunchAttendees(mPlaceId, mEmployeeUid, employeeInfo);
 
-            if (mLunchPlaceToRemove != null && mLunchPlaceToRemove != mPlaceId)  {
-                RestaurantHelper.deleteLunchPlaces(mLunchPlaceToRemove, mEmployeeUid);
+            WriteBatch batch = mDb.batch();
+            DocumentReference employeeRef = mDb.collection("employees").document(mEmployeeUid);
+            DocumentReference restaurantRef = mDb.collection("restaurants").document(mPlaceId);
+
+            batch.update(employeeRef, "lunchPlace", lunchRestaurant);
+            batch.update(employeeRef, "lunchPlaceId", lunchRestaurantId);
+            batch.update(restaurantRef, "lunchAttendees."+mEmployeeUid, employeeInfo);
+            if (mLunchPlaceToRemove != null && !mLunchPlaceToRemove.equals(mPlaceId)) {
+                DocumentReference restaurantToRemoveRef = mDb.collection("restaurants").document(mLunchPlaceToRemove);
+                batch.update(restaurantToRemoveRef, "lunchAttendees."+mEmployeeUid, FieldValue.delete());
             }
+            batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    Log.i(TAG, "Batched addLunch done");
+                }
+            });
+
         }
     }
 
     private void removeLunchInFirestore() {
         if (this.getCurrentUser() != null){
-            EmployeeHelper.updateLunchPlace(mEmployeeUid, null).addOnFailureListener(this.onFailureListener());
-            EmployeeHelper.updateLunchPlaceId(mEmployeeUid, null).addOnFailureListener(this.onFailureListener());
-            RestaurantHelper.deleteLunchPlaces(mPlaceId, mEmployeeUid);
+            WriteBatch batch = mDb.batch();
+            DocumentReference employeeRef = mDb.collection("employees").document(mEmployeeUid);
+            DocumentReference restaurantRef = mDb.collection("restaurants").document(mPlaceId);
+
+            batch.update(employeeRef, "lunchPlace", null);
+            batch.update(employeeRef, "lunchPlaceId", null);
+            batch.update(restaurantRef, "lunchAttendees."+mEmployeeUid, FieldValue.delete());
+            batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    Log.i(TAG, "Batched removeLunch done");
+                }
+            });
         }
     }
 
