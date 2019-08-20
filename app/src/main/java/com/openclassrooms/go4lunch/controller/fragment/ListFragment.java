@@ -219,7 +219,7 @@ public class ListFragment extends Fragment {
                         if (document != null) {
                             Restaurant thisRestaurant = document.toObject(Restaurant.class);
 
-                            HashMap<String, HashMap<String, String>> placeLunchAttendees = thisRestaurant.getLunchAttendees();
+                            HashMap<String, HashMap<String, String>> placeLunchAttendees = (thisRestaurant == null) ? null : thisRestaurant.getLunchAttendees() ;
                             mRestaurantList.add(new Restaurant(placeId, placeName, null, placeLunchAttendees, placeAddress, placeOpeningHours, placeDistance, placeRating, placePhotoMetadata));
                             System.out.println("LISTE RESTO"+mRestaurantList);
                         } else {

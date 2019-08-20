@@ -41,10 +41,15 @@ import com.google.android.libraries.places.api.model.PlaceLikelihood;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.openclassrooms.go4lunch.R;
 import com.openclassrooms.go4lunch.controller.activity.RestaurantActivity;
+import com.openclassrooms.go4lunch.model.Restaurant;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
@@ -256,18 +261,45 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
                             for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
                                 Place currPlace = placeLikelihood.getPlace();
-                                String iconName = "ic_markers_restaurant_red";
 
                                 if (currPlace.getTypes().contains(Place.Type.RESTAURANT)) {
                                     String mLikelyPlaceNames = currPlace.getName();
                                     LatLng mLikelyPlaceLatLngs = currPlace.getLatLng();
 
-                                    mMap.addMarker(
-                                        new MarkerOptions()
-                                            .position(new LatLng(mLikelyPlaceLatLngs.latitude, mLikelyPlaceLatLngs.longitude))
-                                            .title(mLikelyPlaceNames)
-                                            .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons(iconName,150,150)))
-                                    ).setTag(currPlace.getId());
+                                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+                                    DocumentReference docRef = db.collection("restaurants").document(currPlace.getId());
+                                    docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                            if (task.isSuccessful()) {
+                                                DocumentSnapshot document = task.getResult();
+                                                if (document != null) {
+                                                    String iconName;
+                                                    Restaurant thisRestaurant = document.toObject(Restaurant.class);
+                                                    HashMap<String, HashMap<String, String>> lunchAttendees = (thisRestaurant == null) ? null : thisRestaurant.getLunchAttendees() ;
+                                                    iconName = (lunchAttendees != null && !lunchAttendees.isEmpty())? "ic_markers_restaurant_green" : "ic_markers_restaurant_red";
+
+                                                    mMap.addMarker(
+                                                            new MarkerOptions()
+                                                                    .position(new LatLng(mLikelyPlaceLatLngs.latitude, mLikelyPlaceLatLngs.longitude))
+                                                                    .title(mLikelyPlaceNames)
+                                                                    .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons(iconName,150,150)))
+                                                    ).setTag(currPlace.getId());
+                                                } else {
+                                                    Log.d("LOGGER", "No such document");
+                                                }
+                                            } else {
+                                                Log.d("LOGGER", "get failed with ", task.getException());
+                                            }
+                                        }
+                                    });
+
+//                                    mMap.addMarker(
+//                                        new MarkerOptions()
+//                                            .position(new LatLng(mLikelyPlaceLatLngs.latitude, mLikelyPlaceLatLngs.longitude))
+//                                            .title(mLikelyPlaceNames)
+//                                            .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons(iconName,150,150)))
+//                                    ).setTag(currPlace.getId());
                                 }
                             }
                         } else {
