@@ -5,24 +5,26 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.openclassrooms.go4lunch.model.Attendee;
 import com.openclassrooms.go4lunch.model.Employee;
 
 import java.util.HashMap;
 
-public class EmployeeHelper {
-    private static final String COLLECTION_NAME = "employees";
+public class AttendeeHelper {
+    private static final String COLLECTION_NAME = "restaurants";
+    private static final String SUB_COLLECTION_NAME = "attendees";
 
     // --- COLLECTION REFERENCE ---
 
-    public static CollectionReference getEmployeesCollection(){
-        return FirebaseFirestore.getInstance().collection(COLLECTION_NAME);
+    public static CollectionReference getAttendeeCollection(String placeId){
+        return FirebaseFirestore.getInstance().collection(COLLECTION_NAME).document(placeId).collection(SUB_COLLECTION_NAME);
     }
 
     // --- CREATE ---
 
-    public static Task<Void> createEmployee(String uid, String name, String mail, String urlPicture, String lunchPlace, String lunchPlaceId, HashMap<String, String> likedPlaces) {
-        Employee employeeToCreate = new Employee(uid, name, mail, urlPicture, lunchPlace, lunchPlaceId, likedPlaces);
-        return EmployeeHelper.getEmployeesCollection().document(uid).set(employeeToCreate);
+    public static Task<Void> createAttendee(String uid, String name, String urlPicture, String placeId) {
+        Attendee attendeeToCreate = new Attendee(name, urlPicture);
+        return AttendeeHelper.getAttendeeCollection(placeId).document(uid).set(attendeeToCreate);
     }
 
     // --- GET ---
@@ -50,4 +52,5 @@ public class EmployeeHelper {
     public static Task<Void> deleteLikedPlaces(String uid, String restaurantId) {
         return EmployeeHelper.getEmployeesCollection().document(uid).update("likedPlaces."+restaurantId, FieldValue.delete());
     }
+
 }

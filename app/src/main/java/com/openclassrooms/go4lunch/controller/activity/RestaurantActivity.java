@@ -34,6 +34,7 @@ import com.google.firebase.firestore.WriteBatch;
 import com.openclassrooms.go4lunch.R;
 import com.openclassrooms.go4lunch.api.EmployeeHelper;
 import com.openclassrooms.go4lunch.api.RestaurantHelper;
+import com.openclassrooms.go4lunch.model.Attendee;
 import com.openclassrooms.go4lunch.model.Employee;
 import com.openclassrooms.go4lunch.view.RestaurantAttendeesAdapter;
 
@@ -118,12 +119,12 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
             if (sLikeOn) {
                 this.removeLikeInFirestore();
                 mBtnLike.setTextColor(getResources().getColor(R.color.orange));
-                mBtnLike.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_star, 0, 0);
+                mBtnLike.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_thumb_off, 0, 0);
                 sLikeOn = false;
             } else {
                 this.addLikeInFirestore();
-                mBtnLike.setTextColor(getResources().getColor(R.color.yellow));
-                mBtnLike.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_star_1, 0, 0);
+                mBtnLike.setTextColor(getResources().getColor(R.color.blue));
+                mBtnLike.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_thumb, 0, 0);
                 sLikeOn = true;
             }
         }
@@ -254,13 +255,13 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
 
             batch.update(employeeRef, "likedPlaces."+mPlaceId, mPlace.getName());
             batch.update(restaurantRef, "likes."+mEmployeeUid, employeeInfo);
+
             batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     Log.i(TAG, "Batched addLike done");
                 }
             });
-
         }
     }
 
@@ -286,20 +287,24 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
             String lunchRestaurant = mPlace.getName();
             String lunchRestaurantId = mPlace.getId();
 
-            HashMap<String, String> employeeInfo = new HashMap<String, String>();
-            employeeInfo.put("name", mEmployeeName);
-            employeeInfo.put("urlPic", mEmployeePic);
+//            HashMap<String, String> employeeInfo = new HashMap<String, String>();
+//            employeeInfo.put("name", mEmployeeName);
+//            employeeInfo.put("urlPic", mEmployeePic);
 
             WriteBatch batch = mDb.batch();
             DocumentReference employeeRef = mDb.collection("employees").document(mEmployeeUid);
             DocumentReference restaurantRef = mDb.collection("restaurants").document(mPlaceId);
+            DocumentReference attendeeRef = mDb.collection("restaurants").document(mPlaceId).collection("lunchAttendee").document(mEmployeeUid);
 
+            batch.set(attendeeRef, new Attendee(mEmployeeName, mEmployeePic));
             batch.update(employeeRef, "lunchPlace", lunchRestaurant);
             batch.update(employeeRef, "lunchPlaceId", lunchRestaurantId);
-            batch.update(restaurantRef, "lunchAttendees."+mEmployeeUid, employeeInfo);
+//            batch.update(restaurantRef, "lunchAttendees."+mEmployeeUid, employeeInfo);
             if (mLunchPlaceToRemove != null && !mLunchPlaceToRemove.equals(mPlaceId)) {
-                DocumentReference restaurantToRemoveRef = mDb.collection("restaurants").document(mLunchPlaceToRemove);
-                batch.update(restaurantToRemoveRef, "lunchAttendees."+mEmployeeUid, FieldValue.delete());
+//                DocumentReference restaurantToRemoveRef = mDb.collection("restaurants").document(mLunchPlaceToRemove);
+//                batch.update(restaurantToRemoveRef, "lunchAttendees."+mEmployeeUid, FieldValue.delete());
+                DocumentReference attendeeToRemoveRef = mDb.collection("restaurants").document(mLunchPlaceToRemove).collection("lunchAttendee").document(mEmployeeUid);
+                batch.delete(attendeeToRemoveRef);
             }
             batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
@@ -319,7 +324,9 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
 
             batch.update(employeeRef, "lunchPlace", null);
             batch.update(employeeRef, "lunchPlaceId", null);
-            batch.update(restaurantRef, "lunchAttendees."+mEmployeeUid, FieldValue.delete());
+            DocumentReference attendeeToRemoveRef = mDb.collection("restaurants").document(mPlaceId).collection("lunchAttendee").document(mEmployeeUid);
+            batch.delete(attendeeToRemoveRef);
+//            batch.update(restaurantRef, "lunchAttendees."+mEmployeeUid, FieldValue.delete());
             batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
@@ -347,8 +354,8 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
                         sLunchOn = true;
                     } else {sLunchOn = false;}
                     if (likedPlaces != null && likedPlaces.containsKey(thisRestaurantId)) {
-                        mBtnLike.setTextColor(getResources().getColor(R.color.yellow));
-                        mBtnLike.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_star_1, 0, 0);
+                        mBtnLike.setTextColor(getResources().getColor(R.color.blue));
+                        mBtnLike.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_thumb, 0, 0);
                         sLikeOn = true;
                     } else {sLikeOn = false;}
                 }

@@ -88,7 +88,7 @@
                 android:textSize="15sp"
                 android:textColor="@color/orange"
                 android:gravity="center"
-                android:drawableTop="@drawable/ic_star"
+                android:drawableTop="@drawable/ic_thumb_off"
                 android:background="@color/white"/>
 
             <Button

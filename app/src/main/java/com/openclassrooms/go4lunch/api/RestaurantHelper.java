@@ -5,7 +5,6 @@ import androidx.annotation.NonNull;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -31,10 +30,10 @@ public class RestaurantHelper {
     // --- CREATE ---
 
     public static Task<Void> createRestaurant(String id, String name) {
-//        Restaurant restaurantToCreate = new Restaurant(name);
-        Map<String, Object> restaurantToCreate = new HashMap<>();
-        restaurantToCreate.put("id", id);
-        restaurantToCreate.put("name", name);
+        Restaurant restaurantToCreate = new Restaurant(id, name);
+//        Map<String, Object> restaurantToCreate = new HashMap<>();
+//        restaurantToCreate.put("id", id);
+//        restaurantToCreate.put("name", name);
         return RestaurantHelper.getRestaurantsCollection().document(id).set(restaurantToCreate, SetOptions.merge());
     }
 
@@ -50,15 +49,15 @@ public class RestaurantHelper {
         return RestaurantHelper.getRestaurantsCollection().document(id).update("likes."+employeeId, employeeInfo);
     }
 
-    public static Task<Void> updateLunchAttendees(String id, String employeeId, HashMap<String, String> employeeInfo) {
-        return RestaurantHelper.getRestaurantsCollection().document(id).update("lunchAttendees."+employeeId, employeeInfo);
-    }
+//    public static Task<Void> updateLunchAttendees(String id, String employeeId, HashMap<String, String> employeeInfo) {
+//        return RestaurantHelper.getRestaurantsCollection().document(id).update("lunchAttendees."+employeeId, employeeInfo);
+//    }
 
     // --- DELETE ---
 
-    public static Task<Void> deleteLunchPlaces(String id, String employeeId) {
-        return RestaurantHelper.getRestaurantsCollection().document(id).update("lunchAttendees."+employeeId, FieldValue.delete());
-    }
+//    public static Task<Void> deleteLunchPlaces(String id, String employeeId) {
+//        return RestaurantHelper.getRestaurantsCollection().document(id).update("lunchAttendees."+employeeId, FieldValue.delete());
+//    }
 
     public static Task<Void> deleteLikes(String id, String employeeId) {
         return RestaurantHelper.getRestaurantsCollection().document(id).update("likes."+employeeId, FieldValue.delete());

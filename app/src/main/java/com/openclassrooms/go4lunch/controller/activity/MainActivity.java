@@ -1,31 +1,22 @@
 package com.openclassrooms.go4lunch.controller.activity;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.health.SystemHealthManager;
 import android.widget.Button;
 
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.IdpResponse;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.openclassrooms.go4lunch.R;
 import com.openclassrooms.go4lunch.api.EmployeeHelper;
-import com.openclassrooms.go4lunch.api.TeamHelper;
-import com.openclassrooms.go4lunch.model.Team;
 
 import java.util.Arrays;
-import java.util.HashMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

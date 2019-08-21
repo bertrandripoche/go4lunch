@@ -9,9 +9,11 @@
     <color name="light_orange">#FF8A50</color>
     <color name="light_grey">#CCC</color>
     <color name="yellow">#F8E71C</color>
+    <color name="blue">#2196F3</color>
 
     <color name="black">#000000</color>
 
     <color name="facebook">#4A68B0</color>
     <color name="google">#FF3E30</color>
+
 </resources>
