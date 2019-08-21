@@ -9,16 +9,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.openclassrooms.go4lunch.R;
 
-public class RestaurantAttendeesViewHolder extends RecyclerView.ViewHolder {
-
+public class AttendeesViewHolder extends RecyclerView.ViewHolder {
     AppCompatImageView mEmployeePic;
     TextView mEmployeeDescription;
 
-    public RestaurantAttendeesViewHolder(@NonNull View itemView) {
+    public AttendeesViewHolder(@NonNull View itemView) {
         super(itemView);
+
         mEmployeePic = itemView.findViewById(R.id.item_employee_pic);
         mEmployeeDescription = itemView.findViewById(R.id.item_employee_description);
-
 
     }
 }

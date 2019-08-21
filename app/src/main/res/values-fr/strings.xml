@@ -51,4 +51,5 @@
         <string name="not_decided_yet"> n\'a pas encore choisi.</string>
         <string name="you_did_not_decide_yet">Vous n\'avez pas encore choisi.</string>
         <string name="you_eat_at">Vous mangez chez</string>
+    <string name="you_eat_here">Vous mangez ici.</string>
 </resources>

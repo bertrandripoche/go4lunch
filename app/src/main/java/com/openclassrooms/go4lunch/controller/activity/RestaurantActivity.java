@@ -13,7 +13,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -30,22 +33,27 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.WriteBatch;
 import com.openclassrooms.go4lunch.R;
 import com.openclassrooms.go4lunch.api.EmployeeHelper;
 import com.openclassrooms.go4lunch.api.RestaurantHelper;
 import com.openclassrooms.go4lunch.model.Attendee;
 import com.openclassrooms.go4lunch.model.Employee;
-import com.openclassrooms.go4lunch.view.RestaurantAttendeesAdapter;
+import com.openclassrooms.go4lunch.view.AttendeesAdapter;
+import com.openclassrooms.go4lunch.view.WorkmatesAdapter;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class RestaurantActivity extends BaseActivity implements View.OnClickListener {
 
-//    @BindView(R.id.activity_restaurant_recycler_view) RecyclerView recyclerView;
+    @BindView(R.id.activity_restaurant_recycler_view) RecyclerView mRecyclerView;
 
     private static final String TAG = "Restaurant Log - ";
     private Bundle mExtras;
@@ -66,16 +74,16 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
     private List<Employee> mEmployeeList;
 
     private FirebaseFirestore mDb = FirebaseFirestore.getInstance();
-    private CollectionReference mRestaurantRef = mDb.collection("restaurants");
-    private RestaurantAttendeesAdapter mAdapter;
+    private CollectionReference mRestaurantAttendeesRef;
+    private AttendeesAdapter mAdapter;
 
     final String PLACE_ID = "placeId";
-    final String TEAM = "team";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_restaurant);
+        ButterKnife.bind(this);
 
         mBtnCall=(Button)findViewById(R.id.btnCall);
         mBtnLike=(Button)findViewById(R.id.btnLike);
@@ -153,8 +161,32 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
     }
 
     private void configureRecyclerView() {
+        mRestaurantAttendeesRef = mDb.collection("restaurants").document(mPlaceId).collection("lunchAttendees");
+        Query query = mRestaurantAttendeesRef.orderBy("name", Query.Direction.ASCENDING);
 
+        FirestoreRecyclerOptions<Attendee> options = new FirestoreRecyclerOptions.Builder<Attendee>()
+                .setQuery(query, Attendee.class)
+                .build();
 
+        mAdapter = new AttendeesAdapter(options);
+
+        if (mRecyclerView != null) {
+            mRecyclerView.setHasFixedSize(true);
+            mRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+            mRecyclerView.setAdapter(mAdapter);
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mAdapter.startListening();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mAdapter.stopListening();
     }
 
     private void getEmployeeInfo() {
@@ -242,12 +274,10 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
 
     private void addLikeInFirestore(){
         if (this.getCurrentUser() != null){
-            //EmployeeHelper.updateLikedPlaces(mEmployeeUid, mPlaceId, mPlace.getName());
 
             HashMap<String, String> employeeInfo = new HashMap<String, String>();
             employeeInfo.put("name", mEmployeeName);
             employeeInfo.put("urlPic", mEmployeePic);
-            //RestaurantHelper.updateLikes(mPlaceId, mEmployeeUid, employeeInfo);
 
             WriteBatch batch = mDb.batch();
             DocumentReference employeeRef = mDb.collection("employees").document(mEmployeeUid);
@@ -287,23 +317,15 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
             String lunchRestaurant = mPlace.getName();
             String lunchRestaurantId = mPlace.getId();
 
-//            HashMap<String, String> employeeInfo = new HashMap<String, String>();
-//            employeeInfo.put("name", mEmployeeName);
-//            employeeInfo.put("urlPic", mEmployeePic);
-
             WriteBatch batch = mDb.batch();
             DocumentReference employeeRef = mDb.collection("employees").document(mEmployeeUid);
-            DocumentReference restaurantRef = mDb.collection("restaurants").document(mPlaceId);
-            DocumentReference attendeeRef = mDb.collection("restaurants").document(mPlaceId).collection("lunchAttendee").document(mEmployeeUid);
+            DocumentReference attendeeRef = mDb.collection("restaurants").document(mPlaceId).collection("lunchAttendees").document(mEmployeeUid);
 
-            batch.set(attendeeRef, new Attendee(mEmployeeName, mEmployeePic));
+            batch.set(attendeeRef, new Attendee(mEmployeeUid, mEmployeeName, mEmployeePic));
             batch.update(employeeRef, "lunchPlace", lunchRestaurant);
             batch.update(employeeRef, "lunchPlaceId", lunchRestaurantId);
-//            batch.update(restaurantRef, "lunchAttendees."+mEmployeeUid, employeeInfo);
             if (mLunchPlaceToRemove != null && !mLunchPlaceToRemove.equals(mPlaceId)) {
-//                DocumentReference restaurantToRemoveRef = mDb.collection("restaurants").document(mLunchPlaceToRemove);
-//                batch.update(restaurantToRemoveRef, "lunchAttendees."+mEmployeeUid, FieldValue.delete());
-                DocumentReference attendeeToRemoveRef = mDb.collection("restaurants").document(mLunchPlaceToRemove).collection("lunchAttendee").document(mEmployeeUid);
+                DocumentReference attendeeToRemoveRef = mDb.collection("restaurants").document(mLunchPlaceToRemove).collection("lunchAttendees").document(mEmployeeUid);
                 batch.delete(attendeeToRemoveRef);
             }
             batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -324,9 +346,8 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
 
             batch.update(employeeRef, "lunchPlace", null);
             batch.update(employeeRef, "lunchPlaceId", null);
-            DocumentReference attendeeToRemoveRef = mDb.collection("restaurants").document(mPlaceId).collection("lunchAttendee").document(mEmployeeUid);
+            DocumentReference attendeeToRemoveRef = mDb.collection("restaurants").document(mPlaceId).collection("lunchAttendees").document(mEmployeeUid);
             batch.delete(attendeeToRemoveRef);
-//            batch.update(restaurantRef, "lunchAttendees."+mEmployeeUid, FieldValue.delete());
             batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {

@@ -6,9 +6,6 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.openclassrooms.go4lunch.model.Attendee;
-import com.openclassrooms.go4lunch.model.Employee;
-
-import java.util.HashMap;
 
 public class AttendeeHelper {
     private static final String COLLECTION_NAME = "restaurants";
@@ -23,7 +20,7 @@ public class AttendeeHelper {
     // --- CREATE ---
 
     public static Task<Void> createAttendee(String uid, String name, String urlPicture, String placeId) {
-        Attendee attendeeToCreate = new Attendee(name, urlPicture);
+        Attendee attendeeToCreate = new Attendee(uid, name, urlPicture);
         return AttendeeHelper.getAttendeeCollection(placeId).document(uid).set(attendeeToCreate);
     }
 
