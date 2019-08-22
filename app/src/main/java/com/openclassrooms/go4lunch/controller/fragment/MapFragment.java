@@ -41,9 +41,12 @@ import com.google.android.libraries.places.api.model.PlaceLikelihood;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.openclassrooms.go4lunch.R;
 import com.openclassrooms.go4lunch.controller.activity.RestaurantActivity;
 import com.openclassrooms.go4lunch.model.Restaurant;
@@ -273,27 +276,26 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                                     LatLng mLikelyPlaceLatLngs = currPlace.getLatLng();
 
                                     FirebaseFirestore db = FirebaseFirestore.getInstance();
-                                    DocumentReference docRef = db.collection("restaurants").document(currPlace.getId());
-                                    docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    CollectionReference collectionRef = db.collection("restaurants").document(currPlace.getId()).collection("lunchAttendees");
+                                    collectionRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                         @Override
-                                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                             if (task.isSuccessful()) {
-                                                DocumentSnapshot document = task.getResult();
-                                                if (document != null) {
-                                                    String iconName;
-                                                    Restaurant thisRestaurant = document.toObject(Restaurant.class);
-                                                    HashMap<String, HashMap<String, String>> lunchAttendees = (thisRestaurant == null) ? null : thisRestaurant.getLunchAttendees() ;
-                                                    iconName = (lunchAttendees != null && !lunchAttendees.isEmpty())? "ic_markers_restaurant_green" : "ic_markers_restaurant_red";
+                                                String iconName;
+                                                QuerySnapshot document = task.getResult();
 
-                                                    mMap.addMarker(
-                                                            new MarkerOptions()
-                                                                    .position(new LatLng(mLikelyPlaceLatLngs.latitude, mLikelyPlaceLatLngs.longitude))
-                                                                    .title(mLikelyPlaceNames)
-                                                                    .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons(iconName,150,150)))
-                                                    ).setTag(currPlace.getId());
+                                                if (document.isEmpty()) {
+                                                    iconName = "ic_markers_restaurant_red";
                                                 } else {
-                                                    Log.d("LOGGER", "No such document");
+                                                    iconName = "ic_markers_restaurant_green";
                                                 }
+
+                                                mMap.addMarker(
+                                                        new MarkerOptions()
+                                                                .position(new LatLng(mLikelyPlaceLatLngs.latitude, mLikelyPlaceLatLngs.longitude))
+                                                                .title(mLikelyPlaceNames)
+                                                                .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons(iconName,150,150)))
+                                                ).setTag(currPlace.getId());
                                             } else {
                                                 Log.d("LOGGER", "get failed with ", task.getException());
                                             }

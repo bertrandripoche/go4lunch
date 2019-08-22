@@ -41,7 +41,6 @@ import com.openclassrooms.go4lunch.api.RestaurantHelper;
 import com.openclassrooms.go4lunch.model.Attendee;
 import com.openclassrooms.go4lunch.model.Employee;
 import com.openclassrooms.go4lunch.view.AttendeesAdapter;
-import com.openclassrooms.go4lunch.view.WorkmatesAdapter;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -319,14 +318,18 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
 
             WriteBatch batch = mDb.batch();
             DocumentReference employeeRef = mDb.collection("employees").document(mEmployeeUid);
+            DocumentReference restaurantRef = mDb.collection("restaurants").document(mPlaceId);
             DocumentReference attendeeRef = mDb.collection("restaurants").document(mPlaceId).collection("lunchAttendees").document(mEmployeeUid);
 
             batch.set(attendeeRef, new Attendee(mEmployeeUid, mEmployeeName, mEmployeePic));
+            batch.update(restaurantRef, "lunchAttendees", FieldValue.increment(1));
             batch.update(employeeRef, "lunchPlace", lunchRestaurant);
             batch.update(employeeRef, "lunchPlaceId", lunchRestaurantId);
             if (mLunchPlaceToRemove != null && !mLunchPlaceToRemove.equals(mPlaceId)) {
                 DocumentReference attendeeToRemoveRef = mDb.collection("restaurants").document(mLunchPlaceToRemove).collection("lunchAttendees").document(mEmployeeUid);
                 batch.delete(attendeeToRemoveRef);
+                DocumentReference attendeeToRemoveForCounterRef = mDb.collection("restaurants").document(mLunchPlaceToRemove);
+                batch.update(attendeeToRemoveForCounterRef, "lunchAttendees", FieldValue.increment(-1));
             }
             batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
@@ -334,7 +337,6 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
                     Log.i(TAG, "Batched addLunch done");
                 }
             });
-
         }
     }
 
@@ -343,10 +345,11 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
             WriteBatch batch = mDb.batch();
             DocumentReference employeeRef = mDb.collection("employees").document(mEmployeeUid);
             DocumentReference restaurantRef = mDb.collection("restaurants").document(mPlaceId);
+            DocumentReference attendeeToRemoveRef = mDb.collection("restaurants").document(mPlaceId).collection("lunchAttendees").document(mEmployeeUid);
 
             batch.update(employeeRef, "lunchPlace", null);
             batch.update(employeeRef, "lunchPlaceId", null);
-            DocumentReference attendeeToRemoveRef = mDb.collection("restaurants").document(mPlaceId).collection("lunchAttendees").document(mEmployeeUid);
+            batch.update(restaurantRef, "lunchAttendees", FieldValue.increment(-1));
             batch.delete(attendeeToRemoveRef);
             batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override

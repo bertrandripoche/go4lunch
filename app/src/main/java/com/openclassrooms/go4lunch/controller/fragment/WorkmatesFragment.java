@@ -15,9 +15,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.firebase.ui.auth.AuthUI;
+
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -26,11 +25,9 @@ import com.openclassrooms.go4lunch.controller.activity.RestaurantActivity;
 import com.openclassrooms.go4lunch.model.Employee;
 import com.openclassrooms.go4lunch.utils.ItemClickSupport;
 import com.openclassrooms.go4lunch.view.WorkmatesAdapter;
-import com.openclassrooms.go4lunch.view.WorkmatesViewHolder;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 public class WorkmatesFragment extends Fragment {
     @BindView(R.id.fragment_workmates_recycler_view) RecyclerView mRecyclerView;

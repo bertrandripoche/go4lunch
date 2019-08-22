@@ -88,28 +88,28 @@ public class RestaurantHelper {
 //        return mIsCurrentlyALunchPlace;
 //    }
 
-    public static void checkLunchPlaces() {
-        getRestaurantsCollection().get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                List<String> mLunchPlaces = new ArrayList<>();
-                if (task.isSuccessful()) {
-                    List<DocumentSnapshot> myListOfDocuments = new ArrayList<DocumentSnapshot>();
-                    myListOfDocuments = task.getResult().getDocuments();
-
-                    if (!myListOfDocuments.isEmpty()) {
-                        ListIterator<DocumentSnapshot> it = myListOfDocuments.listIterator();
-                        while(it.hasNext()){
-                            DocumentSnapshot restaurantDoc = it.next();
-                            Restaurant restaurant = restaurantDoc.toObject(Restaurant.class);
-                            HashMap<String, HashMap<String, String>> lunchAttendees = restaurant.getLunchAttendees();
-                            if (lunchAttendees != null && !lunchAttendees.isEmpty()) {
-                                mLunchPlaces.add(restaurant.getId());
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-    }
+//    public static void checkLunchPlaces() {
+//        getRestaurantsCollection().get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//            @Override
+//            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                List<String> mLunchPlaces = new ArrayList<>();
+//                if (task.isSuccessful()) {
+//                    List<DocumentSnapshot> myListOfDocuments = new ArrayList<DocumentSnapshot>();
+//                    myListOfDocuments = task.getResult().getDocuments();
+//
+//                    if (!myListOfDocuments.isEmpty()) {
+//                        ListIterator<DocumentSnapshot> it = myListOfDocuments.listIterator();
+//                        while(it.hasNext()){
+//                            DocumentSnapshot restaurantDoc = it.next();
+//                            Restaurant restaurant = restaurantDoc.toObject(Restaurant.class);
+//                            HashMap<String, HashMap<String, String>> lunchAttendees = restaurant.getLunchAttendees();
+//                            if (lunchAttendees != null && !lunchAttendees.isEmpty()) {
+//                                mLunchPlaces.add(restaurant.getId());
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            });
+//    }
 }
