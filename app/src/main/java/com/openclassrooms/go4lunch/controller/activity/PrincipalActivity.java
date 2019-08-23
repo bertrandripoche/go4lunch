@@ -45,8 +45,6 @@ public class PrincipalActivity extends BaseActivity implements NavigationView.On
     private FirebaseUser mCurrentUser;
     private NavigationView navigationView;
 
-    private boolean mIsLunchSet;
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

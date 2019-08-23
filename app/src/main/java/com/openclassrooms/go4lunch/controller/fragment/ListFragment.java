@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -23,7 +24,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
@@ -39,7 +42,9 @@ import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.openclassrooms.go4lunch.R;
 import com.openclassrooms.go4lunch.controller.activity.PrincipalActivity;
 import com.openclassrooms.go4lunch.controller.activity.RestaurantActivity;
@@ -189,8 +194,6 @@ public class ListFragment extends Fragment {
                                     }
                                 }
 
-
-
                             } else {
                                 Exception exception = task.getException();
                                 if (exception instanceof ApiException) {
@@ -220,28 +223,34 @@ public class ListFragment extends Fragment {
             String placeDistance = getDistanceFromLastKnownLocation(mPlace.getLatLng().latitude, mPlace.getLatLng().longitude);
             PhotoMetadata placePhotoMetadata = mPlace.getPhotoMetadatas().get(0);
 
-
             DocumentReference docRef = mRestaurantsRef.document(mPlace.getId());
-            docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
                 @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    int placeLunchAttendees;
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot document = task.getResult();
-
-                        if (document != null) {
-                            Restaurant restaurant = document.toObject(Restaurant.class);
-                            placeLunchAttendees = (restaurant != null) ? restaurant.getLunchAttendees() : 0;
-                        } else {
-                            placeLunchAttendees = 0;
-                            Log.d("LOGGER", "No such document");
-                        }
+                public void onEvent(@Nullable DocumentSnapshot snapshot,
+                                    @Nullable FirebaseFirestoreException e) {
+                    if (e != null) {
+                        Log.w(TAG, "Listen failed.", e);
+                        return;
+                    }
+                    int placeLunchAttendees = 0;
+                    if (snapshot != null && snapshot.exists()) {
+                        Log.d(TAG, "Current data: " + snapshot.getData());
+                        Restaurant restaurant = snapshot.toObject(Restaurant.class);
+                        assert restaurant != null;
+                        placeLunchAttendees = (restaurant != null) ? restaurant.getLunchAttendees() : 0;
                     } else {
-                        placeLunchAttendees = 0;
-                        Log.d("LOGGER", "get failed with ", task.getException());
+                        Log.d(TAG, "Current data: null");
                     }
 
-                    pendingRestaurantList.add(new Restaurant(placeId, placeName, null, placeLunchAttendees, placeAddress, placeOpeningHours, placeDistance, placeRating, placePhotoMetadata));
+                    Restaurant restaurant = findUsingEnhancedForLoop(placeName, pendingRestaurantList);
+                    if (restaurant != null) {
+                        restaurant.setLunchAttendees(placeLunchAttendees);
+                        System.out.println("Restaurant pour update"+restaurant);
+                    }
+                    else {
+                        pendingRestaurantList.add(new Restaurant(placeId, placeName, null, placeLunchAttendees, placeAddress, placeOpeningHours, placeDistance, placeRating, placePhotoMetadata));
+                        System.out.println("Restaurant pour update"+pendingRestaurantList);
+                    }
                     updateUI(pendingRestaurantList);
                 }
             });
@@ -293,4 +302,13 @@ public class ListFragment extends Fragment {
         mAdapter.notifyDataSetChanged();
     }
 
+    public Restaurant findUsingEnhancedForLoop(String name, List<Restaurant> restaurantList) {
+
+        for (Restaurant restaurant : restaurantList) {
+            if (restaurant.getName().equals(name)) {
+                return restaurant;
+            }
+        }
+        return null;
+    }
 }

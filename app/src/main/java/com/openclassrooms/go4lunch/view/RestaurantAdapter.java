@@ -75,7 +75,10 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantViewHolder
             holder.mRestaurantPhoto.setImageResource(R.drawable.bg_resto);
         }
 
-        if (restaurant.getLunchAttendees() != 0) {
+        if (restaurant.getLunchAttendees() == 0) {
+            holder.mRestaurantLunchAttendees.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+            holder.mRestaurantLunchAttendees.setText(null);
+        } else {
             holder.mRestaurantLunchAttendees.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_participant, 0, 0, 0);
             String lunchAttendeesText = "(" +restaurant.getLunchAttendees()+ ")";
             holder.mRestaurantLunchAttendees.setText(lunchAttendeesText);
