@@ -185,7 +185,7 @@ public class PrincipalActivity extends BaseActivity implements NavigationView.On
                 .into(userPic);
     }
 
-    private boolean isLunchPlaceSet() {
+    public boolean isLunchPlaceSet() {
         if (this.getCurrentUser() != null){
             String mEmployeeUid = this.getCurrentUser().getUid();
             EmployeeHelper.getEmployee(mEmployeeUid).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {

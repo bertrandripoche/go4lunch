@@ -41,6 +41,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.openclassrooms.go4lunch.R;
+import com.openclassrooms.go4lunch.controller.activity.PrincipalActivity;
 import com.openclassrooms.go4lunch.controller.activity.RestaurantActivity;
 import com.openclassrooms.go4lunch.model.Restaurant;
 import com.openclassrooms.go4lunch.utils.ItemClickSupport;
@@ -48,11 +49,6 @@ import com.openclassrooms.go4lunch.view.RestaurantAdapter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
@@ -134,8 +130,7 @@ public class ListFragment extends Fragment {
     }
 
     private void getLocationPermission() {
-        if (ContextCompat.checkSelfPermission(getActivity().getApplicationContext(),
-                ACCESS_FINE_LOCATION)
+        if (ContextCompat.checkSelfPermission(getActivity().getApplicationContext(),ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mLocationPermissionGranted = true;
         } else {

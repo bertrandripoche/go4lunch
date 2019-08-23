@@ -43,6 +43,7 @@ public class AttendeesAdapter extends FirestoreRecyclerAdapter<Attendee, Attende
         } else {
             attendeesViewHolder.mEmployeeDescription.setText(firstName + resources.getString(R.string.is_eating_here));
             attendeesViewHolder.mEmployeeDescription.setTextColor(resources.getColor(R.color.black));
+            attendeesViewHolder.mEmployeeDescription.setTypeface(null, Typeface.NORMAL);
         }
     }
 

@@ -34,6 +34,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.firestore.WriteBatch;
 import com.openclassrooms.go4lunch.R;
 import com.openclassrooms.go4lunch.api.EmployeeHelper;
@@ -45,6 +46,7 @@ import com.openclassrooms.go4lunch.view.AttendeesAdapter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import butterknife.BindView;
@@ -268,7 +270,12 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
     }
 
     private void createRestaurantInFirestore() {
-        RestaurantHelper.createRestaurant(mPlaceId,mPlace.getName()).addOnFailureListener(onFailureListener());
+        //RestaurantHelper.createRestaurant(mPlaceId,mPlace.getName()).addOnFailureListener(onFailureListener());
+        Map<String, Object> docData = new HashMap<>();
+        docData.put("name", mPlace.getName());
+        docData.put("id", mPlaceId);
+
+        mDb.collection("restaurants").document(mPlaceId).set(docData, SetOptions.merge());
     }
 
     private void addLikeInFirestore(){
@@ -349,6 +356,7 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
 
             batch.update(employeeRef, "lunchPlace", null);
             batch.update(employeeRef, "lunchPlaceId", null);
+
             batch.update(restaurantRef, "lunchAttendees", FieldValue.increment(-1));
             batch.delete(attendeeToRemoveRef);
             batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
