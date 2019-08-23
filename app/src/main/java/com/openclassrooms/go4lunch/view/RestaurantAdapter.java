@@ -56,9 +56,9 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantViewHolder
         if (restaurant.getDistance() != null) holder.mRestaurantDistance.setText(restaurant.getDistance());
 
         System.out.println("RATING : "+restaurant.getRating());
-        if (2 <= restaurant.getRating() && restaurant.getRating() < 3) holder.mRestaurantRating.setImageResource(R.drawable.ic_star_1);
-        if (3 <= restaurant.getRating() && restaurant.getRating() < 4) holder.mRestaurantRating.setImageResource(R.drawable.ic_star_2);
-        if (4 <= restaurant.getRating()) holder.mRestaurantRating.setImageResource(R.drawable.ic_star_3);
+        if (3 <= restaurant.getRating() && restaurant.getRating() < 4) holder.mRestaurantRating.setImageResource(R.drawable.ic_star_1);
+        if (4 <= restaurant.getRating() && restaurant.getRating() < 4.5) holder.mRestaurantRating.setImageResource(R.drawable.ic_star_2);
+        if (4.5 <= restaurant.getRating()) holder.mRestaurantRating.setImageResource(R.drawable.ic_star_3);
 
         if (restaurant.getPhoto() != null) {
             FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(restaurant.getPhoto()).build();

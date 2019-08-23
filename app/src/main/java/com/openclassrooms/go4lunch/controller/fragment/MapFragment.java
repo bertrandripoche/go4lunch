@@ -8,6 +8,7 @@ import android.location.Location;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -44,7 +45,9 @@ import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.openclassrooms.go4lunch.R;
@@ -54,6 +57,7 @@ import com.openclassrooms.go4lunch.model.Restaurant;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
@@ -114,7 +118,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     @Override
     public void onResume() {
         super.onResume();
+        if (mMap != null) mMap.clear();
         getRestaurants();
+        System.out.println("C'est moi on resume FRAGMENT");
     }
 
     @Override
@@ -275,39 +281,36 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                                     String mLikelyPlaceNames = currPlace.getName();
                                     LatLng mLikelyPlaceLatLngs = currPlace.getLatLng();
 
+
                                     FirebaseFirestore db = FirebaseFirestore.getInstance();
-                                    CollectionReference collectionRef = db.collection("restaurants").document(currPlace.getId()).collection("lunchAttendees");
-                                    collectionRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+
+                                    DocumentReference documentRef = db.collection("restaurants").document(currPlace.getId());
+                                    documentRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
                                         @Override
-                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                            if (task.isSuccessful()) {
-                                                String iconName;
-                                                QuerySnapshot document = task.getResult();
-
-                                                if (document.isEmpty()) {
-                                                    iconName = "ic_markers_restaurant_red";
-                                                } else {
-                                                    iconName = "ic_markers_restaurant_green";
-                                                }
-
-                                                mMap.addMarker(
-                                                        new MarkerOptions()
-                                                                .position(new LatLng(mLikelyPlaceLatLngs.latitude, mLikelyPlaceLatLngs.longitude))
-                                                                .title(mLikelyPlaceNames)
-                                                                .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons(iconName,150,150)))
-                                                ).setTag(currPlace.getId());
-                                            } else {
-                                                Log.d("LOGGER", "get failed with ", task.getException());
+                                        public void onEvent(@Nullable DocumentSnapshot snapshot,
+                                                            @Nullable FirebaseFirestoreException e) {
+                                            if (e != null) {
+                                                Log.w(TAG, "Listen failed.", e);
+                                                return;
                                             }
+                                            String iconName = "ic_markers_restaurant_red";
+                                            if (snapshot != null && snapshot.exists()) {
+                                                Log.d(TAG, "Current data: " + snapshot.getData());
+                                                Restaurant restaurant = snapshot.toObject(Restaurant.class);
+                                                assert restaurant != null;
+                                                if (restaurant.getLunchAttendees() > 0) iconName = "ic_markers_restaurant_green";
+                                            } else {
+                                                Log.d(TAG, "Current data: null");
+                                            }
+                                            mMap.addMarker(
+                                                new MarkerOptions()
+                                                        .position(new LatLng(mLikelyPlaceLatLngs.latitude, mLikelyPlaceLatLngs.longitude))
+                                                        .title(mLikelyPlaceNames)
+                                                        .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons(iconName,150,150)))
+                                                ).setTag(currPlace.getId());
                                         }
                                     });
 
-//                                    mMap.addMarker(
-//                                        new MarkerOptions()
-//                                            .position(new LatLng(mLikelyPlaceLatLngs.latitude, mLikelyPlaceLatLngs.longitude))
-//                                            .title(mLikelyPlaceNames)
-//                                            .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons(iconName,150,150)))
-//                                    ).setTag(currPlace.getId());
                                 }
                             }
                         } else {

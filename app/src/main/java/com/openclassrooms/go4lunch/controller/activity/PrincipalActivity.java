@@ -185,19 +185,10 @@ public class PrincipalActivity extends BaseActivity implements NavigationView.On
                 .into(userPic);
     }
 
-    public boolean isLunchPlaceSet() {
-        if (this.getCurrentUser() != null){
-            String mEmployeeUid = this.getCurrentUser().getUid();
-            EmployeeHelper.getEmployee(mEmployeeUid).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                @Override
-                public void onSuccess(DocumentSnapshot documentSnapshot) {
-                    String lunchPlaceId = documentSnapshot.toObject(Employee.class).getLunchPlaceId();
-                    mIsLunchSet = lunchPlaceId != null;
-//                    System.out.println("LunchPlace : "+lunchPlaceId+"IsLunchSet"+mIsLunchSet);
-                }
-            });
-        }
-        return mIsLunchSet;
+    @Override
+    public void onResume() {
+        super.onResume();
+        System.out.println("C'est moi on resume ACTIVITY");
     }
 
 }

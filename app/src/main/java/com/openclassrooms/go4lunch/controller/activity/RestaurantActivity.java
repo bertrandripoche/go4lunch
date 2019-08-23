@@ -253,9 +253,9 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
         restaurantAddress.setText(address);
 
         AppCompatImageView stars = (AppCompatImageView)findViewById(R.id.restaurant_activity_stars);
-        if (2 <= mPlace.getRating() && mPlace.getRating() < 3) stars.setImageResource(R.drawable.ic_star_1);
-        if (3 <= mPlace.getRating() && mPlace.getRating() < 3) stars.setImageResource(R.drawable.ic_star_2);
-        if (4 <= mPlace.getRating()) stars.setImageResource(R.drawable.ic_star_3);
+        if (3 <= mPlace.getRating() && mPlace.getRating() < 4) stars.setImageResource(R.drawable.ic_star_1);
+        if (4 <= mPlace.getRating() && mPlace.getRating() < 4.5) stars.setImageResource(R.drawable.ic_star_2);
+        if (4.5 <= mPlace.getRating()) stars.setImageResource(R.drawable.ic_star_3);
 
         if (mPlace.getPhoneNumber() == null) {
             mBtnCall.setEnabled(false);

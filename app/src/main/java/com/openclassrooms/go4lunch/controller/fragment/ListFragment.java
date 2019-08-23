@@ -220,7 +220,6 @@ public class ListFragment extends Fragment {
             String placeDistance = getDistanceFromLastKnownLocation(mPlace.getLatLng().latitude, mPlace.getLatLng().longitude);
             PhotoMetadata placePhotoMetadata = mPlace.getPhotoMetadatas().get(0);
 
-            //pendingRestaurantList.add(new Restaurant(placeId, placeName, null, placeAddress, placeOpeningHours, placeDistance, placeRating, placePhotoMetadata));
 
             DocumentReference docRef = mRestaurantsRef.document(mPlace.getId());
             docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
