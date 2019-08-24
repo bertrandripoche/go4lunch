@@ -119,6 +119,7 @@ public class PrincipalActivity extends BaseActivity implements NavigationView.On
                 return true;
             case R.id.activity_main_drawer_logout:
                 mFirebaseUserManagement.signOutUserFromFirebase(this);
+                finish();
                 return true;
             default:
                 break;
