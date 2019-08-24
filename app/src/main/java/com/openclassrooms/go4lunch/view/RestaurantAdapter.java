@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatImageView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.common.api.ApiException;
@@ -55,10 +56,7 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantViewHolder
         }
         if (restaurant.getDistance() != null) holder.mRestaurantDistance.setText(restaurant.getDistance());
 
-        System.out.println("RATING : "+restaurant.getRating());
-        if (3 <= restaurant.getRating() && restaurant.getRating() < 4) holder.mRestaurantRating.setImageResource(R.drawable.ic_star_1);
-        if (4 <= restaurant.getRating() && restaurant.getRating() < 4.5) holder.mRestaurantRating.setImageResource(R.drawable.ic_star_2);
-        if (4.5 <= restaurant.getRating()) holder.mRestaurantRating.setImageResource(R.drawable.ic_star_3);
+        displayRating(holder.mRestaurantRating, restaurant.getRating());
 
         if (restaurant.getPhoto() != null) {
             FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(restaurant.getPhoto()).build();
@@ -94,6 +92,17 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantViewHolder
         Calendar c = Calendar.getInstance();
         c.setTime(new Date());
         int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
+        dayOfWeek = (dayOfWeek == 1)? 6: dayOfWeek-2;
         return dayOfWeek;
+    }
+
+    private void displayRating(AppCompatImageView image, Double rating) {
+        if (rating != null) {
+            if (3 <= rating && rating < 4) image.setImageResource(R.drawable.ic_star_1);
+            if (4 <= rating && rating < 4.5) image.setImageResource(R.drawable.ic_star_2);
+            if (4.5 <= rating) image.setImageResource(R.drawable.ic_star_3);
+        } else {
+            image.setImageResource(R.drawable.ic_star_unknow);
+        }
     }
 }

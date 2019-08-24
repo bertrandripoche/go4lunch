@@ -72,17 +72,17 @@
         <activity
             android:name=".controller.activity.RestaurantActivity"
             android:label="@string/toolbar_title_map"
-            android:parentActivityName=".controller.activity.MainActivity">
+            android:parentActivityName=".controller.activity.PrincipalActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".controller.activity.MainActivity" />
+                android:value=".controller.activity.PrincipalActivity" />
         </activity>
         <activity
             android:name=".controller.activity.RestaurantWebPageActivity"
-            android:parentActivityName=".controller.activity.MainActivity">
+            android:parentActivityName=".controller.activity.RestaurantActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".controller.activity.MainActivity" />
+                android:value=".controller.activity.RestaurantActivity" />
         </activity>
     </application>
 
