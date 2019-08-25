@@ -120,7 +120,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         super.onResume();
         if (mMap != null) mMap.clear();
         getRestaurants();
-        System.out.println("C'est moi on resume FRAGMENT");
     }
 
     @Override

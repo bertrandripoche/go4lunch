@@ -184,10 +184,4 @@ public class PrincipalActivity extends BaseActivity implements NavigationView.On
                 .into(userPic);
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        System.out.println("C'est moi on resume ACTIVITY");
-    }
-
 }

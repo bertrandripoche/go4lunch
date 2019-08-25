@@ -30,23 +30,12 @@ public class FirebaseUserManagement {
     public static FirebaseUser getCurrentUser(){
         return FirebaseAuth.getInstance().getCurrentUser(); }
 
-    private void deleteUserFromFirebase(Context context, Activity activity){
-        if (this.getCurrentUser() != null) {
-            AuthUI.getInstance()
-                    .delete(context)
-                    .addOnSuccessListener(activity, this.updateUIAfterRESTRequestsCompleted(DELETE_USER_TASK,activity));
-        }
-    }
-
     private OnSuccessListener<Void> updateUIAfterRESTRequestsCompleted(final int origin, Activity activity){
         return new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
                 switch (origin){
                     case SIGN_OUT_TASK:
-                        activity.finish();
-                        break;
-                    case DELETE_USER_TASK:
                         activity.finish();
                         break;
                     default:

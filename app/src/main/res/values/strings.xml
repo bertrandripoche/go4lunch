@@ -51,5 +51,6 @@
     <string name="you_did_not_decide_yet">You didn\'t decide yet.</string>
     <string name="you_eat_at">You eat at</string>
     <string name="you_eat_here">You eat here.</string>
+    <string name="search_restaurant">Search restaurant…</string>
 
 </resources>

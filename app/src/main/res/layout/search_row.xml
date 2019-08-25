@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:minHeight="?attr/actionBarSize"
+    android:layout_width="match_parent"
+    android:background="@color/orange"
+    android:layout_height="wrap_content">
+
+    <EditText
+        android:id="@+id/place_search"
+        android:hint="@string/search_restaurant"
+        android:inputType="text"
+        android:padding="15dp"
+        android:layout_margin="5dp"
+        android:elevation="10dp"
+        android:background="@android:color/white"
+        android:drawableStart="@drawable/ic_search_grey"
+        android:drawableEnd="@drawable/ic_micro_grey"
+        android:drawablePadding="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</RelativeLayout>
