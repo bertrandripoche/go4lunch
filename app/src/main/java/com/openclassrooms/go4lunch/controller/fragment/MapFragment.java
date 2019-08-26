@@ -15,10 +15,14 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.RelativeLayout;
 
 import com.google.android.gms.common.api.ApiException;
@@ -37,8 +41,13 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
 import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.AutocompletePrediction;
+import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.PlaceLikelihood;
+import com.google.android.libraries.places.api.model.RectangularBounds;
+import com.google.android.libraries.places.api.model.TypeFilter;
+import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
@@ -51,13 +60,15 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.openclassrooms.go4lunch.R;
+import com.openclassrooms.go4lunch.controller.activity.PrincipalActivity;
 import com.openclassrooms.go4lunch.controller.activity.RestaurantActivity;
 import com.openclassrooms.go4lunch.model.Restaurant;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
@@ -72,9 +83,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private boolean mLocationPermissionGranted;
     private Location mLastKnownLocation;
     private LatLng mLatLngLastKnownLocation;
+    private RectangularBounds mLastKnownLocationBounds;
 
     private PlacesClient mPlacesClient;
-    private List<String> mLunchPlaces;
 
     private final LatLng mDefaultLocation = new LatLng(48.864716, 2.349014);
     private static final int DEFAULT_ZOOM = 19;
@@ -100,6 +111,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        PrincipalActivity principalActivity = (PrincipalActivity) getActivity();
         View v = inflater.inflate(R.layout.fragment_map, container, false);
 
         mMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
@@ -111,6 +123,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         }
 
         mMapFragment.getMapAsync(this);
+
+        principalActivity.mMySearch.addTextChangedListener(textWatcher);
 
         return v;
     }
@@ -243,6 +257,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mLatLngLastKnownLocation, DEFAULT_ZOOM));
 
                             getRestaurants();
+                            getBound(mLatLngLastKnownLocation);
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());
@@ -346,5 +361,63 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         Bitmap imageBitmap = BitmapFactory.decodeResource(getResources(),getResources().getIdentifier(iconName, "drawable", getContext().getPackageName()));
         Bitmap resizedBitmap = Bitmap.createScaledBitmap(imageBitmap, width, height, false);
         return resizedBitmap;
+    }
+
+    private TextWatcher textWatcher = new TextWatcher() {
+        // We disable notification switch after each text modification
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            makeSearch(s.toString());
+            System.out.println("s.toString :"+s.toString());
+        }
+    };
+
+    private void getBound(LatLng coordinates) {
+        double latStart = coordinates.latitude - 0.01;
+        double latStop = coordinates.latitude + 0.01;
+        double lngStart = coordinates.longitude - 0.01;
+        double lngStop = coordinates.longitude + 0.01;
+
+        mLastKnownLocationBounds = RectangularBounds.newInstance(
+                new LatLng(latStart, lngStart),
+                new LatLng(latStop, lngStop));
+
+        System.out.println("mLastKnownLocationBounds is : "+mLastKnownLocationBounds);
+
+    }
+    private void makeSearch(String query) {
+        if (mLastKnownLocationBounds != null) {
+            AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
+
+            RectangularBounds bounds = mLastKnownLocationBounds;
+
+            FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
+                    .setLocationBias(bounds)
+                    .setCountry("fr")
+                    .setTypeFilter(TypeFilter.ESTABLISHMENT)
+                    .setSessionToken(token)
+                    .setQuery(query.toString())
+                    .build();
+
+            mPlacesClient.findAutocompletePredictions(request).addOnSuccessListener((response) -> {
+                for (AutocompletePrediction prediction : response.getAutocompletePredictions()) {
+                    Log.i(TAG, prediction.getPlaceId());
+                    Log.i(TAG, prediction.getPrimaryText(null).toString());
+                }
+            }).addOnFailureListener((exception) -> {
+                if (exception instanceof ApiException) {
+                    ApiException apiException = (ApiException) exception;
+                    Log.e(TAG, "Place not found: " + apiException.getStatusCode());
+                }
+            });
+        }
     }
 }

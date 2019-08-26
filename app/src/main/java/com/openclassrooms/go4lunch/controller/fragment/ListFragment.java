@@ -245,11 +245,11 @@ public class ListFragment extends Fragment {
                     Restaurant restaurant = findUsingEnhancedForLoop(placeName, pendingRestaurantList);
                     if (restaurant != null) {
                         restaurant.setLunchAttendees(placeLunchAttendees);
-                        System.out.println("Restaurant pour update"+restaurant);
+//                        System.out.println("Restaurant pour update"+restaurant);
                     }
                     else {
                         pendingRestaurantList.add(new Restaurant(placeId, placeName, null, placeLunchAttendees, placeAddress, placeOpeningHours, placeDistance, placeRating, placePhotoMetadata));
-                        System.out.println("Restaurant pour update"+pendingRestaurantList);
+//                        System.out.println("Restaurant pour update"+pendingRestaurantList);
                     }
                     updateUI(pendingRestaurantList);
                 }

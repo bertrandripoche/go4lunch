@@ -17,6 +17,9 @@
 
         <include layout="@layout/toolbar"/>
 
+        <include layout="@layout/search_row"
+            android:visibility="invisible"/>
+
         <FrameLayout
             android:id="@+id/container"
             android:layout_width="match_parent"
@@ -42,14 +45,14 @@
         app:headerLayout="@layout/activity_principal_nav_drawer"
         app:menu="@menu/nav_drawer" >
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/logo_g4l"
-                android:layout_gravity="bottom|center"
-                android:layout_marginBottom="20dp"/>
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/logo_g4l"
+            android:layout_gravity="bottom|center"
+            android:layout_marginBottom="20dp"/>
 
-        </com.google.android.material.navigation.NavigationView>
+    </com.google.android.material.navigation.NavigationView>
 
 
 

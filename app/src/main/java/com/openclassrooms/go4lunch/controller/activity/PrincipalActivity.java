@@ -1,17 +1,22 @@
 package com.openclassrooms.go4lunch.controller.activity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
@@ -35,11 +40,13 @@ import com.openclassrooms.go4lunch.utils.FirebaseUserManagement;
 
 public class PrincipalActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    private AppCompatImageView mProfilePic;
-    private TextView mProfileName;
-    private TextView mProfileMail;
+//    private AppCompatImageView mProfilePic;
+//    private TextView mProfileName;
+//    private TextView mProfileMail;
 
     private Toolbar mToolbar;
+    public RelativeLayout mSearchBar;
+    public EditText mMySearch;
     private DrawerLayout mDrawerLayout;
     private FirebaseUserManagement mFirebaseUserManagement;
     private FirebaseUser mCurrentUser;
@@ -49,12 +56,16 @@ public class PrincipalActivity extends BaseActivity implements NavigationView.On
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_principal);
+
         this.configureToolbar();
         this.configureDrawerLayout();
         this.configureNavigationView();
         mFirebaseUserManagement = new FirebaseUserManagement();
 
         loadFragment(new MapFragment());
+
+        mSearchBar = findViewById(R.id.search_bar);
+        mMySearch = findViewById(R.id.my_search);
 
         BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.navbar);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -81,6 +92,16 @@ public class PrincipalActivity extends BaseActivity implements NavigationView.On
                 return true;
             }
         });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() ==  R.id.menu_search) {
+            openSearch();
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -132,6 +153,9 @@ public class PrincipalActivity extends BaseActivity implements NavigationView.On
     public void onBackPressed() {
         if (this.mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
             this.mDrawerLayout.closeDrawer(GravityCompat.START);
+        } else if (this.mSearchBar.getVisibility() == View.VISIBLE) {
+            mSearchBar.setVisibility(View.INVISIBLE);
+            mToolbar.setVisibility(View.VISIBLE);
         } else {
             super.onBackPressed();
         }
@@ -178,10 +202,15 @@ public class PrincipalActivity extends BaseActivity implements NavigationView.On
         Uri userPhotoUri = mCurrentUser.getPhotoUrl();
 
         Glide.with(this)
-                .load(userPhotoUri)
-                .fitCenter()
-                .circleCrop()
-                .into(userPic);
+            .load(userPhotoUri)
+            .fitCenter()
+            .circleCrop()
+            .into(userPic);
+    }
+
+    private void openSearch() {
+        mSearchBar.setVisibility(View.VISIBLE);
+        mToolbar.setVisibility(View.INVISIBLE);
     }
 
 }
