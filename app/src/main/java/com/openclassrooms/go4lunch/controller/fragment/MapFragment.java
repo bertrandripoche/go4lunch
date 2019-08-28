@@ -21,8 +21,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.RelativeLayout;
 
 import com.google.android.gms.common.api.ApiException;
@@ -51,14 +49,11 @@ import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRe
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.openclassrooms.go4lunch.R;
 import com.openclassrooms.go4lunch.controller.activity.PrincipalActivity;
 import com.openclassrooms.go4lunch.controller.activity.RestaurantActivity;
@@ -66,9 +61,6 @@ import com.openclassrooms.go4lunch.model.Restaurant;
 
 import java.util.Arrays;
 import java.util.List;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
@@ -309,12 +301,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                                             }
                                             String iconName = "ic_markers_restaurant_red";
                                             if (snapshot != null && snapshot.exists()) {
-                                                Log.d(TAG, "Current data: " + snapshot.getData());
+//                                                Log.d(TAG, "Current data: " + snapshot.getData());
                                                 Restaurant restaurant = snapshot.toObject(Restaurant.class);
                                                 assert restaurant != null;
                                                 if (restaurant.getLunchAttendees() > 0) iconName = "ic_markers_restaurant_green";
                                             } else {
-                                                Log.d(TAG, "Current data: null");
+//                                                Log.d(TAG, "Current data: null");
                                             }
                                             mMap.addMarker(
                                                 new MarkerOptions()
@@ -363,8 +355,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         return resizedBitmap;
     }
 
-    private TextWatcher textWatcher = new TextWatcher() {
-        // We disable notification switch after each text modification
+    public TextWatcher textWatcher = new TextWatcher() {
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
         }
@@ -376,31 +367,26 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         @Override
         public void afterTextChanged(Editable s) {
             makeSearch(s.toString());
-            System.out.println("s.toString :"+s.toString());
         }
     };
 
     private void getBound(LatLng coordinates) {
-        double latStart = coordinates.latitude - 0.01;
-        double latStop = coordinates.latitude + 0.01;
-        double lngStart = coordinates.longitude - 0.01;
-        double lngStop = coordinates.longitude + 0.01;
+        double latStart = coordinates.latitude - 0.005;
+        double latStop = coordinates.latitude + 0.005;
+        double lngStart = coordinates.longitude - 0.005;
+        double lngStop = coordinates.longitude + 0.005;
 
         mLastKnownLocationBounds = RectangularBounds.newInstance(
                 new LatLng(latStart, lngStart),
                 new LatLng(latStop, lngStop));
-
-        System.out.println("mLastKnownLocationBounds is : "+mLastKnownLocationBounds);
-
     }
-    private void makeSearch(String query) {
+
+    public void makeSearch(String query) {
         if (mLastKnownLocationBounds != null) {
             AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
-
-            RectangularBounds bounds = mLastKnownLocationBounds;
-
+            System.out.println("mLastKnownLocationBounds is : "+mLastKnownLocationBounds);
             FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
-                    .setLocationBias(bounds)
+                    .setLocationBias(mLastKnownLocationBounds)
                     .setCountry("fr")
                     .setTypeFilter(TypeFilter.ESTABLISHMENT)
                     .setSessionToken(token)
@@ -409,8 +395,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
             mPlacesClient.findAutocompletePredictions(request).addOnSuccessListener((response) -> {
                 for (AutocompletePrediction prediction : response.getAutocompletePredictions()) {
-                    Log.i(TAG, prediction.getPlaceId());
-                    Log.i(TAG, prediction.getPrimaryText(null).toString());
+                    if (prediction.getPlaceTypes().contains(Place.Type.RESTAURANT)) {
+                        System.out.println(prediction.getPlaceId()+"-"+prediction.getPrimaryText(null)+" est un restaurant.");
+                    } else {
+                        System.out.println(prediction.getPlaceId()+"-"+prediction.getPrimaryText(null)+" N'est PAS un restaurant.");
+                    }
+
                 }
             }).addOnFailureListener((exception) -> {
                 if (exception instanceof ApiException) {

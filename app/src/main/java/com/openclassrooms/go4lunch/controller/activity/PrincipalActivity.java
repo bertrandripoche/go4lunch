@@ -1,10 +1,8 @@
 package com.openclassrooms.go4lunch.controller.activity;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,7 +14,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
@@ -40,16 +37,12 @@ import com.openclassrooms.go4lunch.utils.FirebaseUserManagement;
 
 public class PrincipalActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-//    private AppCompatImageView mProfilePic;
-//    private TextView mProfileName;
-//    private TextView mProfileMail;
-
     private Toolbar mToolbar;
     public RelativeLayout mSearchBar;
     public EditText mMySearch;
     private DrawerLayout mDrawerLayout;
     private FirebaseUserManagement mFirebaseUserManagement;
-    private FirebaseUser mCurrentUser;
+    public static FirebaseUser mCurrentUser;
     private NavigationView navigationView;
 
     @Override

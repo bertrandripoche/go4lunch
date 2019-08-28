@@ -53,4 +53,5 @@
         <string name="you_eat_at">Vous mangez chez</string>
         <string name="you_eat_here">Vous mangez ici.</string>
         <string name="search_restaurant">Recherche restaurant…</string>
+    <string name="default_notification_channel_id">1</string>
 </resources>

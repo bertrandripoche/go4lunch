@@ -52,5 +52,7 @@
     <string name="you_eat_at">You eat at</string>
     <string name="you_eat_here">You eat here.</string>
     <string name="search_restaurant">Search restaurant…</string>
+    <string name="notification_title">G4L : your lunch place today</string>
+    <string name="default_notification_channel_id">1</string>
 
 </resources>
