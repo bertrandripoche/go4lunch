@@ -23,8 +23,6 @@ import com.openclassrooms.go4lunch.controller.activity.PrincipalActivity;
 import com.openclassrooms.go4lunch.controller.activity.RestaurantActivity;
 import com.openclassrooms.go4lunch.model.Employee;
 
-import java.util.HashMap;
-
 public class NotificationsService extends FirebaseMessagingService {
     private final int NOTIFICATION_ID = 001;
     private final String NOTIFICATION_TAG = "FIREBASE_NOTIF";
