@@ -45,8 +45,9 @@ public class NotificationsService extends FirebaseMessagingService {
                     Employee employee = documentSnapshot.toObject(Employee.class);
                     String message = (employee.getLunchPlace() == null) ? getApplicationContext().getResources().getString(R.string.you_did_not_decide_yet): getApplicationContext().getResources().getString(R.string.you_eat_at) + " " + employee.getLunchPlace();
                     String placeId = employee.getLunchPlaceId();
+                    boolean notif = employee.getNotif();
 
-                    sendVisualNotification(message, placeId);
+                    if (notif) sendVisualNotification(message, placeId);
                 }
             });
         }

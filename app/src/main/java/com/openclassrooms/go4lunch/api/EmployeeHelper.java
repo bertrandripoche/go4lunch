@@ -45,6 +45,10 @@ public class EmployeeHelper {
         return EmployeeHelper.getEmployeesCollection().document(uid).update("likedPlaces."+restaurantId, restaurantName);
     }
 
+    public static Task<Void> updateNotif(String uid, boolean notif) {
+        return EmployeeHelper.getEmployeesCollection().document(uid).update("notif", notif);
+    }
+
     // --- DELETE ---
 
     public static Task<Void> deleteLikedPlaces(String uid, String restaurantId) {

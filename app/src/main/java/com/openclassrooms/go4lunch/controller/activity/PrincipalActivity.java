@@ -129,7 +129,8 @@ public class PrincipalActivity extends BaseActivity implements NavigationView.On
 
                 return true;
             case R.id.activity_main_drawer_settings:
-                System.out.println("MENU SETTINGS");
+                Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+                startActivity(intent);
                 return true;
             case R.id.activity_main_drawer_logout:
                 mFirebaseUserManagement.signOutUserFromFirebase(this);

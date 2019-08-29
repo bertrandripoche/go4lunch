@@ -85,6 +85,14 @@
                 android:value=".controller.activity.RestaurantActivity" />
         </activity>
 
+        <activity
+            android:name=".controller.activity.SettingsActivity"
+            android:parentActivityName=".controller.activity.RestaurantActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".controller.activity.PrincipalActivity" />
+        </activity>
+
         <!-- NOTIFICATION SERVICE -->
         <service
             android:name=".notifications.NotificationsService">
