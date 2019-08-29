@@ -25,7 +25,10 @@ public class WorkmatesAdapter extends FirestoreRecyclerAdapter<Employee, Workmat
     @Override
     protected void onBindViewHolder(@NonNull WorkmatesViewHolder workmatesViewHolder, int i, @NonNull Employee employee) {
         Resources resources = workmatesViewHolder.itemView.getContext().getResources();
-        Uri employeePicUri = Uri.parse(employee.getUrlPicture());
+
+        Uri employeePicUri = (employee.getUrlPicture() == null) ?
+                Uri.parse("android.resource://"+workmatesViewHolder.itemView.getContext().getPackageName()+"/drawable/ic_thats_me"):
+                Uri.parse(employee.getUrlPicture());
         Glide.with(workmatesViewHolder.itemView.getContext())
                 .load(employeePicUri)
                 .fitCenter()

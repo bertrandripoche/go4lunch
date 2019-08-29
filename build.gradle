@@ -18,7 +18,10 @@ allprojects {
     repositories {
 
         google()
-        jcenter()}
+        jcenter()
+        mavenCentral()
+    }
+
 }
 
 task clean(type: Delete) {

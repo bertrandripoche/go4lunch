@@ -3,8 +3,12 @@
     <string name="main_activity_description">Find a nice restaurant and invite your co-workers for lunch !</string>
     <string name="sign_in_facebook">Sign in with Facebook</string>
     <string name="sign_in_google">Sign in with Google</string>
-    <string name="google">google</string>
-    <string name="facebook">facebook</string>
+    <string name="sign_in_mail">Sign in with your mail</string>
+    <string name="sign_in_twitter">Sign in with Twitter</string>
+    <string name="google" translatable="false">google</string>
+    <string name="facebook" translatable="false">facebook</string>
+    <string name="twitter" translatable="false">twitter</string>
+    <string name="mail" translatable="false">mail</string>
     <string name="connection_succeed">Connection succeed</string>
     <string name="error_authentication_canceled">Connection canceled</string>
     <string name="error_no_internet">Connection refused. No network.</string>

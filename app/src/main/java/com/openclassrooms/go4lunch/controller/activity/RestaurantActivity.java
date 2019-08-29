@@ -194,7 +194,7 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
         if (this.getCurrentUser() != null){
             mEmployeeUid = this.getCurrentUser().getUid();
             mEmployeeName = this.getCurrentUser().getDisplayName();
-            mEmployeePic = (Objects.requireNonNull(this.getCurrentUser().getPhotoUrl()).toString().equals("")) ? "noPicture": this.getCurrentUser().getPhotoUrl().toString();
+            mEmployeePic = (this.getCurrentUser().getPhotoUrl() == null) ? null : this.getCurrentUser().getPhotoUrl().toString();
         }
     }
 
@@ -270,7 +270,6 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
     }
 
     private void createRestaurantInFirestore() {
-        //RestaurantHelper.createRestaurant(mPlaceId,mPlace.getName()).addOnFailureListener(onFailureListener());
         Map<String, Object> docData = new HashMap<>();
         docData.put("name", mPlace.getName());
         docData.put("id", mPlaceId);

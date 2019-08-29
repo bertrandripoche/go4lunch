@@ -27,8 +27,9 @@ public class AttendeesAdapter extends FirestoreRecyclerAdapter<Attendee, Attende
         Resources resources = attendeesViewHolder.itemView.getContext().getResources();
         String currentUserUid = FirebaseUserManagement.getCurrentUser().getUid();
 
-        Uri employeePicUri = Uri.parse(attendee.getUrlPicture());
-
+        Uri employeePicUri = (attendee.getUrlPicture() == null) ?
+                Uri.parse("android.resource://"+attendeesViewHolder.itemView.getContext().getPackageName()+"/drawable/ic_thats_me"):
+                Uri.parse(attendee.getUrlPicture());
         Glide.with(attendeesViewHolder.itemView.getContext())
                 .load(employeePicUri)
                 .fitCenter()

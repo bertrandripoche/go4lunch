@@ -5,8 +5,8 @@
         <string name="main_activity_description">Trouvez un bon resto et invitez vos collègues pour le déjeuner !</string>
         <string name="sign_in_facebook">Connexion avec Facebook</string>
         <string name="sign_in_google">Connexion avec Google</string>
-        <string name="google">google</string>
-        <string name="facebook">facebook</string>
+        <string name="sign_in_mail">Connexion avec votre mail</string>
+        <string name="sign_in_twitter">Connexion avec Twitter</string>
         <string name="connection_succeed">Connexion réussie</string>
         <string name="error_authentication_canceled">Connexion annulée</string>
         <string name="error_no_internet">Connexion refusée. Pas de réseau.</string>
@@ -57,4 +57,5 @@
         <string name="default_notification_channel_id">1</string>
         <string name="enable_notifications">Activer les notifications</string>
         <string name="disable_notifications">Désactiver les notifications</string>
+
 </resources>
