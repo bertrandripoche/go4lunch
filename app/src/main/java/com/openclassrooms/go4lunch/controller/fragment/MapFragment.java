@@ -121,6 +121,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         return v;
     }
 
+
     @Override
     public void onResume() {
         super.onResume();
@@ -223,10 +224,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         try {
             if (mLocationPermissionGranted) {
                 mMap.setMyLocationEnabled(true);
-                //mMap.getUiSettings().setMyLocationButtonEnabled(true);
             } else {
                 mMap.setMyLocationEnabled(false);
-                //mMap.getUiSettings().setMyLocationButtonEnabled(false);
                 mLastKnownLocation = null;
                 getLocationPermission();
             }

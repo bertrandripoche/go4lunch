@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -21,6 +22,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.openclassrooms.go4lunch.R;
+import com.openclassrooms.go4lunch.controller.activity.PrincipalActivity;
 import com.openclassrooms.go4lunch.controller.activity.RestaurantActivity;
 import com.openclassrooms.go4lunch.model.Employee;
 import com.openclassrooms.go4lunch.utils.ItemClickSupport;
@@ -36,16 +38,29 @@ public class WorkmatesFragment extends Fragment {
     private CollectionReference mWorkmatesRef = db.collection("employees");
     private WorkmatesAdapter mAdapter;
     private TextView mEmployeeDescription;
+    private PrincipalActivity mPrincipalActivity;
 
     public WorkmatesFragment() {}
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        mPrincipalActivity = (PrincipalActivity) getActivity();
         View view = inflater.inflate(R.layout.fragment_workmates, container, false);
         ButterKnife.bind(this, view);
+        configureMenu(false);
         configureRecyclerView();
         configureOnClickRecyclerView();
         return view;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        configureMenu(true);
+    }
+
+    private void configureMenu(boolean makeVisible) {
+        mPrincipalActivity.mSearchIcon.setVisible(makeVisible);
     }
 
     private void configureRecyclerView() {

@@ -40,6 +40,7 @@ public class PrincipalActivity extends BaseActivity implements NavigationView.On
     private Toolbar mToolbar;
     public RelativeLayout mSearchBar;
     public EditText mMySearch;
+    public MenuItem mSearchIcon;
     private DrawerLayout mDrawerLayout;
     private FirebaseUserManagement mFirebaseUserManagement;
     public static FirebaseUser mCurrentUser;
@@ -54,11 +55,10 @@ public class PrincipalActivity extends BaseActivity implements NavigationView.On
         this.configureDrawerLayout();
         this.configureNavigationView();
         mFirebaseUserManagement = new FirebaseUserManagement();
-
-        loadFragment(new MapFragment());
-
         mSearchBar = findViewById(R.id.search_bar);
         mMySearch = findViewById(R.id.my_search);
+
+        loadFragment(new MapFragment());
 
         BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.navbar);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -158,6 +158,8 @@ public class PrincipalActivity extends BaseActivity implements NavigationView.On
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.search_menu, menu);
+        mSearchIcon = menu.getItem(0);
+        System.out.println("mySearchIcon "+mSearchIcon);
         return true;
     }
 
