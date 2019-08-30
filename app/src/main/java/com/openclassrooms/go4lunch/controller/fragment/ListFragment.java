@@ -2,7 +2,6 @@ package com.openclassrooms.go4lunch.controller.fragment;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,7 +13,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.AppCompatImageView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -24,9 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
@@ -34,7 +30,6 @@ import com.google.android.libraries.places.api.model.OpeningHours;
 import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.PlaceLikelihood;
-import com.google.android.libraries.places.api.net.FetchPhotoRequest;
 import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
@@ -46,7 +41,6 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.openclassrooms.go4lunch.R;
-import com.openclassrooms.go4lunch.controller.activity.PrincipalActivity;
 import com.openclassrooms.go4lunch.controller.activity.RestaurantActivity;
 import com.openclassrooms.go4lunch.model.Restaurant;
 import com.openclassrooms.go4lunch.utils.ItemClickSupport;
@@ -73,7 +67,7 @@ public class ListFragment extends Fragment {
     private Place mPlace;
     private PlacesClient mPlacesClient;
     private final LatLng mDefaultLocation = new LatLng(48.864716, 2.349014);
-    private List<Restaurant> mRestaurantList = new ArrayList<>();
+    private List<Restaurant> mRestaurantList;
 
     private FirebaseFirestore mDb = FirebaseFirestore.getInstance();
     private CollectionReference mRestaurantsRef = mDb.collection("restaurants");
@@ -184,13 +178,12 @@ public class ListFragment extends Fragment {
                         public void onComplete(@NonNull Task<FindCurrentPlaceResponse> task) {
                             if (task.isSuccessful()) {
                                 FindCurrentPlaceResponse response = task.getResult();
-                                List<Restaurant> pendingRestaurantList = new ArrayList<>();
 
                                 for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
                                     Place currPlace = placeLikelihood.getPlace();
 
                                     if (currPlace.getTypes().contains(Place.Type.RESTAURANT)) {
-                                        getPlaceInfo(currPlace.getId(), pendingRestaurantList);
+                                        getPlaceInfo(currPlace.getId(), mRestaurantList);
                                     }
                                 }
 
@@ -245,11 +238,9 @@ public class ListFragment extends Fragment {
                     Restaurant restaurant = findUsingEnhancedForLoop(placeName, pendingRestaurantList);
                     if (restaurant != null) {
                         restaurant.setLunchAttendees(placeLunchAttendees);
-//                        System.out.println("Restaurant pour update"+restaurant);
                     }
                     else {
                         pendingRestaurantList.add(new Restaurant(placeId, placeName, null, placeLunchAttendees, placeAddress, placeOpeningHours, placeDistance, placeRating, placePhotoMetadata));
-//                        System.out.println("Restaurant pour update"+pendingRestaurantList);
                     }
                     updateUI(pendingRestaurantList);
                 }
@@ -297,8 +288,6 @@ public class ListFragment extends Fragment {
     }
 
     private void updateUI(List<Restaurant> restaurantList){
-        mRestaurantList.clear();
-        mRestaurantList.addAll(restaurantList);
         mAdapter.notifyDataSetChanged();
     }
 

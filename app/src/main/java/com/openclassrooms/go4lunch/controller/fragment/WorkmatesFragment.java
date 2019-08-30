@@ -59,6 +59,12 @@ public class WorkmatesFragment extends Fragment {
         configureMenu(true);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        configureMenu(false);
+    }
+
     private void configureMenu(boolean makeVisible) {
         mPrincipalActivity.mSearchIcon.setVisible(makeVisible);
     }
