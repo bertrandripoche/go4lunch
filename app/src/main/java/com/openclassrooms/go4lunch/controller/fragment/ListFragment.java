@@ -55,7 +55,7 @@ import butterknife.ButterKnife;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
-public class ListFragment extends Fragment {
+public class ListFragment extends BaseFragment {
     @BindView(R.id.fragment_list_recycler_view) RecyclerView mRecyclerView;
 
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
@@ -64,6 +64,8 @@ public class ListFragment extends Fragment {
 
     private boolean mLocationPermissionGranted;
     private Location mLastKnownLocation;
+    private LatLng mLatLngLastKnownLocation;
+
     private Place mPlace;
     private PlacesClient mPlacesClient;
     private final LatLng mDefaultLocation = new LatLng(48.864716, 2.349014);
@@ -149,8 +151,10 @@ public class ListFragment extends Fragment {
                         if (task.isSuccessful()) {
                             Log.d(TAG, "Location successful.");
                             mLastKnownLocation = task.getResult();
+                            mLatLngLastKnownLocation =  new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
 
                             getRestaurants();
+                            mLastKnownLocationBounds = getBound(mLatLngLastKnownLocation);
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());
@@ -202,9 +206,8 @@ public class ListFragment extends Fragment {
         }
     }
 
-    private void getPlaceInfo(String placeId, List<Restaurant> pendingRestaurantList) {
+    private void getPlaceInfo(String placeId, List<Restaurant> restaurantList) {
         List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.ADDRESS, Place.Field.RATING, Place.Field.PHOTO_METADATAS, Place.Field.OPENING_HOURS);
-
         FetchPlaceRequest request = FetchPlaceRequest.newInstance(placeId, placeFields);
 
         mPlacesClient.fetchPlace(request).addOnSuccessListener((response) -> {
@@ -235,14 +238,14 @@ public class ListFragment extends Fragment {
                         Log.d(TAG, "Current data: null");
                     }
 
-                    Restaurant restaurant = findUsingEnhancedForLoop(placeName, pendingRestaurantList);
+                    Restaurant restaurant = findUsingEnhancedForLoop(placeName, restaurantList);
                     if (restaurant != null) {
                         restaurant.setLunchAttendees(placeLunchAttendees);
                     }
                     else {
-                        pendingRestaurantList.add(new Restaurant(placeId, placeName, null, placeLunchAttendees, placeAddress, placeOpeningHours, placeDistance, placeRating, placePhotoMetadata));
+                        restaurantList.add(new Restaurant(placeId, placeName, null, placeLunchAttendees, placeAddress, placeOpeningHours, placeDistance, placeRating, placePhotoMetadata));
                     }
-                    updateUI(pendingRestaurantList);
+                    updateUI(restaurantList);
                 }
             });
 

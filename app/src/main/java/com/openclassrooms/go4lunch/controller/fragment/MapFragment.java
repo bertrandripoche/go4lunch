@@ -64,7 +64,7 @@ import java.util.List;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
-public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMarkerClickListener {
+public class MapFragment extends BaseFragment implements OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMarkerClickListener {
 
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private static final String TAG = "Map Fragment";
@@ -75,9 +75,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private boolean mLocationPermissionGranted;
     private Location mLastKnownLocation;
     private LatLng mLatLngLastKnownLocation;
-    private RectangularBounds mLastKnownLocationBounds;
 
-    private PlacesClient mPlacesClient;
+//    private RectangularBounds mLastKnownLocationBounds;
+//    private PlacesClient mPlacesClient;
 
     private final LatLng mDefaultLocation = new LatLng(48.864716, 2.349014);
     private static final int DEFAULT_ZOOM = 19;
@@ -103,7 +103,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        PrincipalActivity principalActivity = (PrincipalActivity) getActivity();
+
         View v = inflater.inflate(R.layout.fragment_map, container, false);
 
         mMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
@@ -115,8 +115,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         }
 
         mMapFragment.getMapAsync(this);
-
-        principalActivity.mMySearch.addTextChangedListener(textWatcher);
 
         return v;
     }
@@ -248,7 +246,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mLatLngLastKnownLocation, DEFAULT_ZOOM));
 
                             getRestaurants();
-                            getBound(mLatLngLastKnownLocation);
+                            mLastKnownLocationBounds = getBound(mLatLngLastKnownLocation);
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());
@@ -354,59 +352,59 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         return resizedBitmap;
     }
 
-    public TextWatcher textWatcher = new TextWatcher() {
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-        }
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {
-            makeSearch(s.toString());
-        }
-    };
-
-    private void getBound(LatLng coordinates) {
-        double latStart = coordinates.latitude - 0.005;
-        double latStop = coordinates.latitude + 0.005;
-        double lngStart = coordinates.longitude - 0.005;
-        double lngStop = coordinates.longitude + 0.005;
-
-        mLastKnownLocationBounds = RectangularBounds.newInstance(
-                new LatLng(latStart, lngStart),
-                new LatLng(latStop, lngStop));
-    }
-
-    public void makeSearch(String query) {
-        if (mLastKnownLocationBounds != null) {
-            AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
-            System.out.println("mLastKnownLocationBounds is : "+mLastKnownLocationBounds);
-            FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
-                    .setLocationBias(mLastKnownLocationBounds)
-                    .setCountry("fr")
-                    .setTypeFilter(TypeFilter.ESTABLISHMENT)
-                    .setSessionToken(token)
-                    .setQuery(query.toString())
-                    .build();
-
-            mPlacesClient.findAutocompletePredictions(request).addOnSuccessListener((response) -> {
-                for (AutocompletePrediction prediction : response.getAutocompletePredictions()) {
-                    if (prediction.getPlaceTypes().contains(Place.Type.RESTAURANT)) {
-                        System.out.println(prediction.getPlaceId()+"-"+prediction.getPrimaryText(null)+" est un restaurant.");
-                    } else {
-                        System.out.println(prediction.getPlaceId()+"-"+prediction.getPrimaryText(null)+" N'est PAS un restaurant.");
-                    }
-
-                }
-            }).addOnFailureListener((exception) -> {
-                if (exception instanceof ApiException) {
-                    ApiException apiException = (ApiException) exception;
-                    Log.e(TAG, "Place not found: " + apiException.getStatusCode());
-                }
-            });
-        }
-    }
+//    public TextWatcher textWatcher = new TextWatcher() {
+//        @Override
+//        public void onTextChanged(CharSequence s, int start, int before, int count) {
+//        }
+//
+//        @Override
+//        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//        }
+//
+//        @Override
+//        public void afterTextChanged(Editable s) {
+//            makeSearch(s.toString());
+//        }
+//    };
+//
+//    private void getBound(LatLng coordinates) {
+//        double latStart = coordinates.latitude - 0.005;
+//        double latStop = coordinates.latitude + 0.005;
+//        double lngStart = coordinates.longitude - 0.005;
+//        double lngStop = coordinates.longitude + 0.005;
+//
+//        mLastKnownLocationBounds = RectangularBounds.newInstance(
+//                new LatLng(latStart, lngStart),
+//                new LatLng(latStop, lngStop));
+//    }
+//
+//    public void makeSearch(String query) {
+//        if (mLastKnownLocationBounds != null) {
+//            AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
+//            System.out.println("mLastKnownLocationBounds is : "+mLastKnownLocationBounds);
+//            FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
+//                    .setLocationBias(mLastKnownLocationBounds)
+//                    .setCountry("fr")
+//                    .setTypeFilter(TypeFilter.ESTABLISHMENT)
+//                    .setSessionToken(token)
+//                    .setQuery(query.toString())
+//                    .build();
+//
+//            mPlacesClient.findAutocompletePredictions(request).addOnSuccessListener((response) -> {
+//                for (AutocompletePrediction prediction : response.getAutocompletePredictions()) {
+//                    if (prediction.getPlaceTypes().contains(Place.Type.RESTAURANT)) {
+//                        System.out.println(prediction.getPlaceId()+"-"+prediction.getPrimaryText(null)+" est un restaurant.");
+//                    } else {
+//                        System.out.println(prediction.getPlaceId()+"-"+prediction.getPrimaryText(null)+" N'est PAS un restaurant.");
+//                    }
+//
+//                }
+//            }).addOnFailureListener((exception) -> {
+//                if (exception instanceof ApiException) {
+//                    ApiException apiException = (ApiException) exception;
+//                    Log.e(TAG, "Place not found: " + apiException.getStatusCode());
+//                }
+//            });
+//        }
+//    }
 }

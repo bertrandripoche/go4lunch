@@ -148,6 +148,7 @@ public class PrincipalActivity extends BaseActivity implements NavigationView.On
         if (this.mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
             this.mDrawerLayout.closeDrawer(GravityCompat.START);
         } else if (this.mSearchBar.getVisibility() == View.VISIBLE) {
+            mMySearch.setText(null);
             mSearchBar.setVisibility(View.INVISIBLE);
             mToolbar.setVisibility(View.VISIBLE);
         } else {
