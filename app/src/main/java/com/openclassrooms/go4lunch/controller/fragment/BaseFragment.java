@@ -1,5 +1,6 @@
 package com.openclassrooms.go4lunch.controller.fragment;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -10,25 +11,60 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatImageView;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.AutocompletePrediction;
 import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
+import com.google.android.libraries.places.api.model.OpeningHours;
+import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.RectangularBounds;
 import com.google.android.libraries.places.api.model.TypeFilter;
+import com.google.android.libraries.places.api.net.FetchPhotoRequest;
+import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
+import com.openclassrooms.go4lunch.R;
 import com.openclassrooms.go4lunch.controller.activity.PrincipalActivity;
+import com.openclassrooms.go4lunch.model.Restaurant;
 
-public class BaseFragment extends Fragment {
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public abstract class BaseFragment extends Fragment {
+
+    abstract void displayPlacesIdList();
+    abstract void displayPlace(Restaurant restaurant);
 
     private static final String TAG = "BaseFragment - ";
 
     protected static RectangularBounds mLastKnownLocationBounds;
     protected static PlacesClient mPlacesClient;
+    protected static List<String> mPlacesIdList = new ArrayList<>();
+    protected final LatLng mDefaultLocation = new LatLng(48.864716, 2.349014);
+    protected FusedLocationProviderClient mFusedLocationProviderClient;
+    protected FirebaseFirestore mDb = FirebaseFirestore.getInstance();
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        Places.initialize(getContext(), getString(R.string.google_maps_key));
+        mPlacesClient = Places.createClient(getContext());
+        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
+    }
 
     @Nullable
     @Override
@@ -50,6 +86,8 @@ public class BaseFragment extends Fragment {
 
         @Override
         public void afterTextChanged(Editable s) {
+            // RAJOUTER UNE METHODE ABSTRAITE POUR CLEANER AVANT DE METTRE DES NOUVEAUX MARKER
+            mPlacesIdList.clear();
             makeSearch(s.toString(), mLastKnownLocationBounds, mPlacesClient);
         }
     };
@@ -70,7 +108,7 @@ public class BaseFragment extends Fragment {
             AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
 
             FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
-                    .setLocationBias(bounds)
+                    .setLocationRestriction(bounds)
                     .setCountry("fr")
                     .setTypeFilter(TypeFilter.ESTABLISHMENT)
                     .setSessionToken(token)
@@ -79,13 +117,15 @@ public class BaseFragment extends Fragment {
 
             placesClient.findAutocompletePredictions(request).addOnSuccessListener((response) -> {
                 for (AutocompletePrediction prediction : response.getAutocompletePredictions()) {
+                    System.out.println("Types du restaurant "+prediction.getPrimaryText(null)+" - "+prediction.getPlaceTypes());
                     if (prediction.getPlaceTypes().contains(Place.Type.RESTAURANT)) {
                         System.out.println(prediction.getPlaceId()+"-"+prediction.getPrimaryText(null)+" est un restaurant.");
+                        mPlacesIdList.add(prediction.getPlaceId());
                     } else {
                         System.out.println(prediction.getPlaceId()+"-"+prediction.getPrimaryText(null)+" N'est PAS un restaurant.");
                     }
-
                 }
+                displayPlacesIdList();
             }).addOnFailureListener((exception) -> {
                 if (exception instanceof ApiException) {
                     ApiException apiException = (ApiException) exception;
@@ -94,4 +134,41 @@ public class BaseFragment extends Fragment {
             });
         }
     }
+
+    protected void makeRestaurantFromPlaceId(String placeId) {
+        List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.PHONE_NUMBER, Place.Field.WEBSITE_URI, Place.Field.ADDRESS, Place.Field.RATING, Place.Field.PHOTO_METADATAS);
+        FetchPlaceRequest request = FetchPlaceRequest.newInstance(placeId, placeFields);
+
+        mPlacesClient.fetchPlace(request).addOnSuccessListener((response) -> {
+            Place place = response.getPlace();
+            String name = place.getName();
+            String address = place.getAddress();
+            LatLng latLng = place.getLatLng();
+            OpeningHours openingHours = place.getOpeningHours();
+            PhotoMetadata photoMetadata = (place.getPhotoMetadatas() == null) ? null : place.getPhotoMetadatas().get(0);
+
+            Restaurant restaurant = new Restaurant(placeId, name, null, null, address, openingHours, latLng, null, null, photoMetadata);
+            createRestaurantInFirestore(restaurant);
+            displayPlace(restaurant);
+
+        }).addOnFailureListener((exception) -> {
+            if (exception instanceof ApiException) {
+                ApiException apiException = (ApiException) exception;
+                int statusCode = apiException.getStatusCode();
+                Log.e(TAG, "Restaurant not found: " + exception.getMessage());
+            }
+        });
+    }
+
+    protected void createRestaurantInFirestore(Restaurant restaurant) {
+        Map<String, Object> docData = new HashMap<>();
+        docData.put("name", restaurant.getName());
+        docData.put("id", restaurant.getId());
+        docData.put("address", restaurant.getAddress());
+        docData.put("openingHours", restaurant.getOpeningHours());
+        docData.put("photoMetadata", restaurant.getPhoto());
+
+        mDb.collection("restaurants").document(restaurant.getId()).set(docData, SetOptions.merge());
+    }
+
 }

@@ -51,15 +51,18 @@ public class PrincipalActivity extends BaseActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_principal);
 
-        this.configureToolbar();
-        this.configureDrawerLayout();
-        this.configureNavigationView();
         mFirebaseUserManagement = new FirebaseUserManagement();
         mSearchBar = findViewById(R.id.search_bar);
         mMySearch = findViewById(R.id.my_search);
 
+        configureToolbar();
+        configureDrawerLayout();
+        configureNavigationView();
         loadFragment(new MapFragment());
+        configureBottomNavigationMenu();
+    }
 
+    void configureBottomNavigationMenu() {
         BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.navbar);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -68,11 +71,13 @@ public class PrincipalActivity extends BaseActivity implements NavigationView.On
                 switch (item.getItemId()) {
                     case R.id.nav_map:
                         mToolbar.setTitle(R.string.toolbar_title_map);
+                        closeSearch();
                         fragment = new MapFragment();
                         loadFragment(fragment);
                         break;
                     case R.id.nav_list:
                         mToolbar.setTitle(R.string.toolbar_title_list);
+                        closeSearch();
                         fragment = new ListFragment();
                         loadFragment(fragment);
                         break;
@@ -148,9 +153,7 @@ public class PrincipalActivity extends BaseActivity implements NavigationView.On
         if (this.mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
             this.mDrawerLayout.closeDrawer(GravityCompat.START);
         } else if (this.mSearchBar.getVisibility() == View.VISIBLE) {
-            mMySearch.setText(null);
-            mSearchBar.setVisibility(View.INVISIBLE);
-            mToolbar.setVisibility(View.VISIBLE);
+            closeSearch();
         } else {
             super.onBackPressed();
         }
@@ -160,7 +163,6 @@ public class PrincipalActivity extends BaseActivity implements NavigationView.On
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.search_menu, menu);
         mSearchIcon = menu.getItem(0);
-        System.out.println("mySearchIcon "+mSearchIcon);
         return true;
     }
 
@@ -208,6 +210,12 @@ public class PrincipalActivity extends BaseActivity implements NavigationView.On
     private void openSearch() {
         mSearchBar.setVisibility(View.VISIBLE);
         mToolbar.setVisibility(View.INVISIBLE);
+    }
+
+    private void closeSearch() {
+        mMySearch.setText(null);
+        mSearchBar.setVisibility(View.INVISIBLE);
+        mToolbar.setVisibility(View.VISIBLE);
     }
 
 }

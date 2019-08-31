@@ -15,7 +15,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -60,18 +59,18 @@ public class ListFragment extends BaseFragment {
 
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private static final String TAG = "List Fragment";
-    private FusedLocationProviderClient mFusedLocationProviderClient;
+//    private FusedLocationProviderClient mFusedLocationProviderClient;
 
     private boolean mLocationPermissionGranted;
     private Location mLastKnownLocation;
     private LatLng mLatLngLastKnownLocation;
 
     private Place mPlace;
-    private PlacesClient mPlacesClient;
-    private final LatLng mDefaultLocation = new LatLng(48.864716, 2.349014);
+//    private PlacesClient mPlacesClient;
+//    private final LatLng mDefaultLocation = new LatLng(48.864716, 2.349014);
     private List<Restaurant> mRestaurantList;
 
-    private FirebaseFirestore mDb = FirebaseFirestore.getInstance();
+//    private FirebaseFirestore mDb = FirebaseFirestore.getInstance();
     private CollectionReference mRestaurantsRef = mDb.collection("restaurants");
 
     private RestaurantAdapter mAdapter;
@@ -83,17 +82,18 @@ public class ListFragment extends BaseFragment {
         return (new ListFragment());
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        Places.initialize(getContext(), getString(R.string.google_maps_key));
-        mPlacesClient = Places.createClient(getContext());
-        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
-    }
+//    @Override
+//    public void onCreate(Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//
+//        Places.initialize(getContext(), getString(R.string.google_maps_key));
+//        mPlacesClient = Places.createClient(getContext());
+//        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
+//    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        super.onCreateView(inflater,container,savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_list, container, false);
         ButterKnife.bind(this, view);
 
@@ -106,6 +106,11 @@ public class ListFragment extends BaseFragment {
         return view;
     }
 
+    @Override
+    void displayPlacesIdList() {
+        System.out.println("Display PlacesId List");
+    }
+
     private void configureRecyclerView() {
         mRestaurantList = new ArrayList<>();
 
@@ -113,6 +118,11 @@ public class ListFragment extends BaseFragment {
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setAdapter(mAdapter);
+    }
+
+    @Override
+    void displayPlace(Restaurant restaurant) {
+        System.out.println("À FAIREEEEE");
     }
 
     @Override
@@ -215,6 +225,7 @@ public class ListFragment extends BaseFragment {
             String placeName = mPlace.getName();
             String placeAddress = mPlace.getAddress();
             Double placeRating = mPlace.getRating();
+            LatLng placeLatLng = mPlace.getLatLng();
             OpeningHours placeOpeningHours = mPlace.getOpeningHours();
             String placeDistance = getDistanceFromLastKnownLocation(mPlace.getLatLng().latitude, mPlace.getLatLng().longitude);
             PhotoMetadata placePhotoMetadata = mPlace.getPhotoMetadatas().get(0);
@@ -243,7 +254,7 @@ public class ListFragment extends BaseFragment {
                         restaurant.setLunchAttendees(placeLunchAttendees);
                     }
                     else {
-                        restaurantList.add(new Restaurant(placeId, placeName, null, placeLunchAttendees, placeAddress, placeOpeningHours, placeDistance, placeRating, placePhotoMetadata));
+                        restaurantList.add(new Restaurant(placeId, placeName, null, placeLunchAttendees, placeAddress, placeOpeningHours, placeLatLng, placeDistance, placeRating, placePhotoMetadata));
                     }
                     updateUI(restaurantList);
                 }

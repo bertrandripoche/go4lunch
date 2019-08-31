@@ -11,12 +11,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,8 +21,6 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -38,24 +33,16 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
-import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.AutocompletePrediction;
-import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.PlaceLikelihood;
-import com.google.android.libraries.places.api.model.RectangularBounds;
-import com.google.android.libraries.places.api.model.TypeFilter;
-import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
-import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.openclassrooms.go4lunch.R;
-import com.openclassrooms.go4lunch.controller.activity.PrincipalActivity;
 import com.openclassrooms.go4lunch.controller.activity.RestaurantActivity;
 import com.openclassrooms.go4lunch.model.Restaurant;
 
@@ -70,16 +57,11 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Goo
     private static final String TAG = "Map Fragment";
     private GoogleMap mMap;
     private SupportMapFragment mMapFragment;
-    private FusedLocationProviderClient mFusedLocationProviderClient;
 
     private boolean mLocationPermissionGranted;
     private Location mLastKnownLocation;
     private LatLng mLatLngLastKnownLocation;
 
-//    private RectangularBounds mLastKnownLocationBounds;
-//    private PlacesClient mPlacesClient;
-
-    private final LatLng mDefaultLocation = new LatLng(48.864716, 2.349014);
     private static final int DEFAULT_ZOOM = 19;
 
     public MapFragment() {
@@ -92,17 +74,9 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Goo
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        Places.initialize(getContext(), getString(R.string.google_maps_key));
-        mPlacesClient = Places.createClient(getContext());
-        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        super.onCreateView(inflater,container,savedInstanceState);
 
         View v = inflater.inflate(R.layout.fragment_map, container, false);
 
@@ -119,6 +93,48 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Goo
         return v;
     }
 
+    @Override
+    void displayPlacesIdList() {
+        if (!mPlacesIdList.isEmpty()) {
+            System.out.println("Display PlacesId List");
+            mMap.clear();
+            for (String placeId : mPlacesIdList) {
+                makeRestaurantFromPlaceId(placeId);
+            }
+
+        }
+    }
+
+    @Override
+    void displayPlace(Restaurant resto) {
+
+        DocumentReference documentRef = mDb.collection("restaurants").document(resto.getId());
+        documentRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot snapshot,
+                                @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w(TAG, "Listen failed.", e);
+                    return;
+                }
+                String iconName = "ic_markers_restaurant_red";
+                if (snapshot != null && snapshot.exists()) {
+//                                                Log.d(TAG, "Current data: " + snapshot.getData());
+                    Restaurant restaurant = snapshot.toObject(Restaurant.class);
+                    assert restaurant != null;
+                    if (restaurant.getLunchAttendees() != null && restaurant.getLunchAttendees() > 0) iconName = "ic_markers_restaurant_green";
+                } else {
+//                                                Log.d(TAG, "Current data: null");
+                }
+                mMap.addMarker(
+                        new MarkerOptions()
+                                .position(new LatLng(resto.getLatLng().latitude, resto.getLatLng().longitude))
+                                .title(resto.getName())
+                                .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons(iconName,150,150)))
+                ).setTag(resto.getId());
+            }
+        });
+    }
 
     @Override
     public void onResume() {
@@ -247,6 +263,8 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Goo
 
                             getRestaurants();
                             mLastKnownLocationBounds = getBound(mLatLngLastKnownLocation);
+                            System.out.println("LtnLng"+mLastKnownLocation.getLatitude()+"/"+mLastKnownLocation.getLongitude());
+                            System.out.println("Bounds"+mLastKnownLocationBounds);
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());
@@ -279,11 +297,11 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Goo
 
                             for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
                                 Place currPlace = placeLikelihood.getPlace();
+                                System.out.println("Types du restaurant "+currPlace.getName()+" - "+currPlace.getTypes());
 
                                 if (currPlace.getTypes().contains(Place.Type.RESTAURANT)) {
                                     String mLikelyPlaceNames = currPlace.getName();
                                     LatLng mLikelyPlaceLatLngs = currPlace.getLatLng();
-
 
                                     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -352,59 +370,4 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Goo
         return resizedBitmap;
     }
 
-//    public TextWatcher textWatcher = new TextWatcher() {
-//        @Override
-//        public void onTextChanged(CharSequence s, int start, int before, int count) {
-//        }
-//
-//        @Override
-//        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-//        }
-//
-//        @Override
-//        public void afterTextChanged(Editable s) {
-//            makeSearch(s.toString());
-//        }
-//    };
-//
-//    private void getBound(LatLng coordinates) {
-//        double latStart = coordinates.latitude - 0.005;
-//        double latStop = coordinates.latitude + 0.005;
-//        double lngStart = coordinates.longitude - 0.005;
-//        double lngStop = coordinates.longitude + 0.005;
-//
-//        mLastKnownLocationBounds = RectangularBounds.newInstance(
-//                new LatLng(latStart, lngStart),
-//                new LatLng(latStop, lngStop));
-//    }
-//
-//    public void makeSearch(String query) {
-//        if (mLastKnownLocationBounds != null) {
-//            AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
-//            System.out.println("mLastKnownLocationBounds is : "+mLastKnownLocationBounds);
-//            FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
-//                    .setLocationBias(mLastKnownLocationBounds)
-//                    .setCountry("fr")
-//                    .setTypeFilter(TypeFilter.ESTABLISHMENT)
-//                    .setSessionToken(token)
-//                    .setQuery(query.toString())
-//                    .build();
-//
-//            mPlacesClient.findAutocompletePredictions(request).addOnSuccessListener((response) -> {
-//                for (AutocompletePrediction prediction : response.getAutocompletePredictions()) {
-//                    if (prediction.getPlaceTypes().contains(Place.Type.RESTAURANT)) {
-//                        System.out.println(prediction.getPlaceId()+"-"+prediction.getPrimaryText(null)+" est un restaurant.");
-//                    } else {
-//                        System.out.println(prediction.getPlaceId()+"-"+prediction.getPrimaryText(null)+" N'est PAS un restaurant.");
-//                    }
-//
-//                }
-//            }).addOnFailureListener((exception) -> {
-//                if (exception instanceof ApiException) {
-//                    ApiException apiException = (ApiException) exception;
-//                    Log.e(TAG, "Place not found: " + apiException.getStatusCode());
-//                }
-//            });
-//        }
-//    }
 }

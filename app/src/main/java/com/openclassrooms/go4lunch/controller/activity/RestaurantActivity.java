@@ -219,7 +219,7 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
             displayRestaurant();
             createRestaurantInFirestore();
 
-            PhotoMetadata photoMetadata = mPlace.getPhotoMetadatas().get(0);
+            PhotoMetadata photoMetadata = Objects.requireNonNull(mPlace.getPhotoMetadatas()).get(0);
 
             AppCompatImageView imageView = (AppCompatImageView)findViewById(R.id.restaurant_activity_pic);
 
@@ -275,7 +275,6 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
         docData.put("id", mPlaceId);
 
         mDb.collection("restaurants").document(mPlaceId).set(docData, SetOptions.merge());
-        System.out.println("Je crée le restaurant avec merge. no batched");
     }
 
     private void addLikeInFirestore(){
