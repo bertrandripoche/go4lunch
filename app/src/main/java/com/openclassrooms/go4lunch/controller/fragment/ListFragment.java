@@ -59,18 +59,14 @@ public class ListFragment extends BaseFragment {
 
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private static final String TAG = "List Fragment";
-//    private FusedLocationProviderClient mFusedLocationProviderClient;
 
     private boolean mLocationPermissionGranted;
     private Location mLastKnownLocation;
     private LatLng mLatLngLastKnownLocation;
 
     private Place mPlace;
-//    private PlacesClient mPlacesClient;
-//    private final LatLng mDefaultLocation = new LatLng(48.864716, 2.349014);
     private List<Restaurant> mRestaurantList;
 
-//    private FirebaseFirestore mDb = FirebaseFirestore.getInstance();
     private CollectionReference mRestaurantsRef = mDb.collection("restaurants");
 
     private RestaurantAdapter mAdapter;
@@ -81,15 +77,6 @@ public class ListFragment extends BaseFragment {
     public static ListFragment newInstance() {
         return (new ListFragment());
     }
-
-//    @Override
-//    public void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//
-//        Places.initialize(getContext(), getString(R.string.google_maps_key));
-//        mPlacesClient = Places.createClient(getContext());
-//        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
-//    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -108,12 +95,25 @@ public class ListFragment extends BaseFragment {
 
     @Override
     void displayPlacesIdList() {
-        System.out.println("Display PlacesId List");
+        mRestaurantList.clear();
+        if (!mPlacesIdList.isEmpty()) {
+            for (String placeId : mPlacesIdList) {
+                makeRestaurantFromPlaceId(placeId);
+            }
+        } else {
+            updateUI(mRestaurantList);
+        }
+    }
+
+    @Override
+    void displayPlace(Restaurant restaurant) {
+        getPlaceInfo(restaurant.getId(), mRestaurantList);
     }
 
     @Override
     void getStandardDisplay() {
-        {System.out.println("Display Standard List");}
+        mRestaurantList.clear();
+        getDeviceLocation();
     }
 
     private void configureRecyclerView() {
@@ -123,11 +123,6 @@ public class ListFragment extends BaseFragment {
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setAdapter(mAdapter);
-    }
-
-    @Override
-    void displayPlace(Restaurant restaurant) {
-        System.out.println("À FAIREEEEE");
     }
 
     @Override
@@ -233,7 +228,7 @@ public class ListFragment extends BaseFragment {
             LatLng placeLatLng = mPlace.getLatLng();
             OpeningHours placeOpeningHours = mPlace.getOpeningHours();
             String placeDistance = getDistanceFromLastKnownLocation(mPlace.getLatLng().latitude, mPlace.getLatLng().longitude);
-            PhotoMetadata placePhotoMetadata = mPlace.getPhotoMetadatas().get(0);
+            PhotoMetadata placePhotoMetadata = (mPlace.getPhotoMetadatas() == null) ? null: mPlace.getPhotoMetadatas().get(0);
 
             DocumentReference docRef = mRestaurantsRef.document(mPlace.getId());
             docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
@@ -249,7 +244,7 @@ public class ListFragment extends BaseFragment {
                         Log.d(TAG, "Current data: " + snapshot.getData());
                         Restaurant restaurant = snapshot.toObject(Restaurant.class);
                         assert restaurant != null;
-                        placeLunchAttendees = (restaurant != null) ? restaurant.getLunchAttendees() : 0;
+                        placeLunchAttendees = (restaurant != null && restaurant.getLunchAttendees() != null) ? restaurant.getLunchAttendees() : 0;
                     } else {
                         Log.d(TAG, "Current data: null");
                     }
@@ -307,6 +302,8 @@ public class ListFragment extends BaseFragment {
     }
 
     private void updateUI(List<Restaurant> restaurantList){
+        System.out.println("La liste "+restaurantList);
+
         mAdapter.notifyDataSetChanged();
     }
 
