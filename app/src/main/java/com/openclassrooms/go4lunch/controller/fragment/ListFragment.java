@@ -111,6 +111,11 @@ public class ListFragment extends BaseFragment {
         System.out.println("Display PlacesId List");
     }
 
+    @Override
+    void getStandardDisplay() {
+        {System.out.println("Display Standard List");}
+    }
+
     private void configureRecyclerView() {
         mRestaurantList = new ArrayList<>();
 

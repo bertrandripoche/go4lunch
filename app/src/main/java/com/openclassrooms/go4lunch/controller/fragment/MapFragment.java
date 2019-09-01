@@ -96,13 +96,16 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Goo
     @Override
     void displayPlacesIdList() {
         if (!mPlacesIdList.isEmpty()) {
-            System.out.println("Display PlacesId List");
             mMap.clear();
             for (String placeId : mPlacesIdList) {
                 makeRestaurantFromPlaceId(placeId);
             }
-
         }
+    }
+
+    @Override
+    void getStandardDisplay() {
+        getRestaurants();
     }
 
     @Override
@@ -166,7 +169,7 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Goo
 
     @Override
     public boolean onMyLocationButtonClick() {
-        getRestaurants();
+        if (mPrincipalActivity.mSearchBar.getVisibility() == View.INVISIBLE) getRestaurants();
         return false;
     }
 
@@ -177,7 +180,6 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Goo
         mLocationPermissionGranted = false;
         switch (requestCode) {
             case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
-                // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     mLocationPermissionGranted = true;
@@ -225,7 +227,6 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Goo
                     new String[]{ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         } else if (mMap != null) {
-            // Access to the location has been granted to the app.
             mMap.setMyLocationEnabled(true);
             mMap.getUiSettings().setMapToolbarEnabled(false);
         }
@@ -263,8 +264,6 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Goo
 
                             getRestaurants();
                             mLastKnownLocationBounds = getBound(mLatLngLastKnownLocation);
-                            System.out.println("LtnLng"+mLastKnownLocation.getLatitude()+"/"+mLastKnownLocation.getLongitude());
-                            System.out.println("Bounds"+mLastKnownLocationBounds);
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());
@@ -280,7 +279,7 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Goo
         }
     }
 
-    private void getRestaurants() {
+    public void getRestaurants() {
         List<Place.Field> placeFields = Arrays.asList(Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG, Place.Field.TYPES, Place.Field.ID);
 
         final FindCurrentPlaceRequest request = FindCurrentPlaceRequest.builder(placeFields).build();
@@ -297,7 +296,6 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Goo
 
                             for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
                                 Place currPlace = placeLikelihood.getPlace();
-                                System.out.println("Types du restaurant "+currPlace.getName()+" - "+currPlace.getTypes());
 
                                 if (currPlace.getTypes().contains(Place.Type.RESTAURANT)) {
                                     String mLikelyPlaceNames = currPlace.getName();
@@ -331,7 +329,6 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Goo
                                                 ).setTag(currPlace.getId());
                                         }
                                     });
-
                                 }
                             }
                         } else {

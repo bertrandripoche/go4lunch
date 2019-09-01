@@ -1,6 +1,5 @@
 package com.openclassrooms.go4lunch.controller.fragment;
 
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -11,7 +10,6 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.AppCompatImageView;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.common.api.ApiException;
@@ -26,11 +24,9 @@ import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.RectangularBounds;
 import com.google.android.libraries.places.api.model.TypeFilter;
-import com.google.android.libraries.places.api.net.FetchPhotoRequest;
 import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 import com.openclassrooms.go4lunch.R;
@@ -46,6 +42,7 @@ import java.util.Map;
 public abstract class BaseFragment extends Fragment {
 
     abstract void displayPlacesIdList();
+    abstract void getStandardDisplay();
     abstract void displayPlace(Restaurant restaurant);
 
     private static final String TAG = "BaseFragment - ";
@@ -56,6 +53,8 @@ public abstract class BaseFragment extends Fragment {
     protected final LatLng mDefaultLocation = new LatLng(48.864716, 2.349014);
     protected FusedLocationProviderClient mFusedLocationProviderClient;
     protected FirebaseFirestore mDb = FirebaseFirestore.getInstance();
+
+    protected PrincipalActivity mPrincipalActivity;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -69,8 +68,8 @@ public abstract class BaseFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        PrincipalActivity principalActivity = (PrincipalActivity) getActivity();
-        principalActivity.mMySearch.addTextChangedListener(textWatcher);
+        mPrincipalActivity = (PrincipalActivity) getActivity();
+        mPrincipalActivity.mMySearch.addTextChangedListener(textWatcher);
 
         return super.onCreateView(inflater, container, savedInstanceState);
     }
@@ -86,7 +85,7 @@ public abstract class BaseFragment extends Fragment {
 
         @Override
         public void afterTextChanged(Editable s) {
-            // RAJOUTER UNE METHODE ABSTRAITE POUR CLEANER AVANT DE METTRE DES NOUVEAUX MARKER
+            if (s.toString().equals("")) getStandardDisplay();
             mPlacesIdList.clear();
             makeSearch(s.toString(), mLastKnownLocationBounds, mPlacesClient);
         }
@@ -117,12 +116,8 @@ public abstract class BaseFragment extends Fragment {
 
             placesClient.findAutocompletePredictions(request).addOnSuccessListener((response) -> {
                 for (AutocompletePrediction prediction : response.getAutocompletePredictions()) {
-                    System.out.println("Types du restaurant "+prediction.getPrimaryText(null)+" - "+prediction.getPlaceTypes());
                     if (prediction.getPlaceTypes().contains(Place.Type.RESTAURANT)) {
-                        System.out.println(prediction.getPlaceId()+"-"+prediction.getPrimaryText(null)+" est un restaurant.");
                         mPlacesIdList.add(prediction.getPlaceId());
-                    } else {
-                        System.out.println(prediction.getPlaceId()+"-"+prediction.getPrimaryText(null)+" N'est PAS un restaurant.");
                     }
                 }
                 displayPlacesIdList();
