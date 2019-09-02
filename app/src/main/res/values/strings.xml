@@ -18,6 +18,8 @@
     <string name="facebook_app_id">341176393440517</string>
     <string name="facebook_application_id" tools:ignore="DuplicateDefinition">341176393440517</string>
     <string name="fb_login_protocol_scheme" translatable="false">fb341176393440517</string>
+    <string name="twitter_consumer_key" translatable="false">9T2EVWSgnXEK98lOaLi4hTgDy</string>
+    <string name="twitter_consumer_secret" translatable="false">KHnMqZYAOPevSi3JOBDNQkq3OZL4kZ3A8htpQ0TQufkhwnS6Jr</string>
 
     <string name="title_workmates">Workmates</string>
     <string name="title_list_view">List View</string>

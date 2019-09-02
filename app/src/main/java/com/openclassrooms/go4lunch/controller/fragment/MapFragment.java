@@ -321,12 +321,14 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Goo
                                             } else {
 //                                                Log.d(TAG, "Current data: null");
                                             }
-                                            mMap.addMarker(
-                                                new MarkerOptions()
-                                                        .position(new LatLng(mLikelyPlaceLatLngs.latitude, mLikelyPlaceLatLngs.longitude))
-                                                        .title(mLikelyPlaceNames)
-                                                        .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons(iconName,150,150)))
+                                            if (mLikelyPlaceLatLngs != null) {
+                                                mMap.addMarker(
+                                                        new MarkerOptions()
+                                                                .position(new LatLng(mLikelyPlaceLatLngs.latitude, mLikelyPlaceLatLngs.longitude))
+                                                                .title(mLikelyPlaceNames)
+                                                                .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons(iconName, 150, 150)))
                                                 ).setTag(currPlace.getId());
+                                            }
                                         }
                                     });
                                 }

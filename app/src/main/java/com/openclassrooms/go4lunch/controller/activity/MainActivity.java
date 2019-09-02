@@ -10,7 +10,6 @@ import android.widget.Button;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.IdpResponse;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.openclassrooms.go4lunch.R;
@@ -35,14 +34,7 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (isCurrentUserLogged()) {
-            setContentView(R.layout.activity_main);
-            ButterKnife.bind(this);
-            startPrincipalActivity();
-        } else {
-            setContentView(R.layout.activity_main);
-            ButterKnife.bind(this);
-        }
+        checkLoginAndDisplayAppropriateScreen();
     }
 
     @Override
@@ -60,42 +52,28 @@ public class MainActivity extends BaseActivity {
 
     @OnClick({R.id.main_activity_button_login_google})
     public void onClickGoogleLoginButton() {
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        if (auth.getCurrentUser() != null) {
-            startPrincipalActivity();
-        } else {
-            this.startSignInActivity("google");
-        }
+        this.startSignInActivity("google");
     }
 
     @OnClick({R.id.main_activity_button_login_facebook})
     public void onClickFacebookLoginButton() {
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        if (auth.getCurrentUser() != null) {
-            startPrincipalActivity();
-        } else {
-            this.startSignInActivity("facebook");
-        }
+        this.startSignInActivity("facebook");
     }
 
     @OnClick({R.id.main_activity_button_login_twitter})
     public void onClickTwitterLoginButton() {
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        if (auth.getCurrentUser() != null) {
-            startPrincipalActivity();
-        } else {
-            this.startSignInActivity("twitter");
-        }
+        this.startSignInActivity("twitter");
     }
 
     @OnClick({R.id.main_activity_button_login_mail})
     public void onClickMailLoginButton() {
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        if (auth.getCurrentUser() != null) {
-            startPrincipalActivity();
-        } else {
-            this.startSignInActivity("mail");
-        }
+        this.startSignInActivity("mail");
+    }
+
+    private void checkLoginAndDisplayAppropriateScreen() {
+        setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
+        if (isCurrentUserLogged()) startPrincipalActivity();
     }
 
     private void startPrincipalActivity() {
