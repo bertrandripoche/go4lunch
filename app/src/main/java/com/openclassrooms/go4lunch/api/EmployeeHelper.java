@@ -20,8 +20,8 @@ public class EmployeeHelper {
 
     // --- CREATE ---
 
-    public static Task<Void> createEmployee(String uid, String name, String mail, String urlPicture, String lunchPlace, String lunchPlaceId, HashMap<String, String> likedPlaces) {
-        Employee employeeToCreate = new Employee(uid, name, mail, urlPicture, lunchPlace, lunchPlaceId, likedPlaces);
+    public static Task<Void> createEmployee(String uid, String name, String mail, String urlPicture) {
+        Employee employeeToCreate = new Employee(uid, name, mail, urlPicture);
         return EmployeeHelper.getEmployeesCollection().document(uid).set(employeeToCreate);
     }
 

@@ -153,10 +153,10 @@ public class PrincipalActivity extends BaseActivity implements NavigationView.On
             this.mDrawerLayout.closeDrawer(GravityCompat.START);
         } else if (this.mSearchBar.getVisibility() == View.VISIBLE) {
             closeSearch();
-        } else {
-            return;
-//            super.onBackPressed();
         }
+//        else {
+//            super.onBackPressed();
+//        }
     }
 
     @Override

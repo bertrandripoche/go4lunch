@@ -27,20 +27,6 @@ public class Employee {
         this.mail = mail;
         this.notif = true;
         this.urlPicture = urlPicture;
-        this.lunchPlace = null;
-        this.lunchPlaceId = null;
-        this.likedPlaces = null;
-    }
-
-    public Employee(String uid, String name, String mail, @Nullable String urlPicture, @Nullable String lunchPlace, @Nullable String lunchPlaceId, @Nullable HashMap<String, String> likedPlaces) {
-        this.uid = uid;
-        this.name = name;
-        this.mail = mail;
-        this.notif = true;
-        this.urlPicture = urlPicture;
-        this.lunchPlace = lunchPlace;
-        this.lunchPlaceId = lunchPlaceId;
-        this.likedPlaces = likedPlaces;
     }
 
     // --- GETTERS ---

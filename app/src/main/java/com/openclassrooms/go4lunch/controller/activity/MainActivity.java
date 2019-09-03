@@ -11,11 +11,14 @@ import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 import com.openclassrooms.go4lunch.R;
 import com.openclassrooms.go4lunch.api.EmployeeHelper;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -30,6 +33,7 @@ public class MainActivity extends BaseActivity {
 
     private static final String TAG = "Log Main Activity";
     private static final int RC_SIGN_IN = 123;
+    private FirebaseFirestore mDb = FirebaseFirestore.getInstance();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -118,18 +122,18 @@ public class MainActivity extends BaseActivity {
                 this.createUserInFirestore();
                 startPrincipalActivity();
             } else {
-                System.out.println("Connexion foirée");
                 if (response == null) {
                     showSnackBar(this.coordinatorLayout, getString(R.string.error_authentication_canceled));
-                    System.out.println("Connexion pour une annulation");
+                    System.out.println("Connection canceled");
                 } else if (response.getError().getErrorCode() == ErrorCodes.NO_NETWORK) {
-                    System.out.println("Connexion pour une réseau");
+                    System.out.println("Connection refused. No network");
 
                     showSnackBar(this.coordinatorLayout, getString(R.string.error_no_internet));
                 } else if (response.getError().getErrorCode() == ErrorCodes.UNKNOWN_ERROR) {
-                    System.out.println("Connexion pour une raison inconnue");
+                    System.out.println("Connection refused. Unknown error.");
                     showSnackBar(this.coordinatorLayout, getString(R.string.error_unknown_error));
                 } else {
+                    System.out.println("Connection refused. Undefined error.");
                     showSnackBar(this.coordinatorLayout, getString(R.string.error_undefined_error));
                 }
             }
@@ -142,7 +146,15 @@ public class MainActivity extends BaseActivity {
             String name = this.getCurrentUser().getDisplayName();
             String mail = this.getCurrentUser().getEmail();
             String urlPicture = (this.getCurrentUser().getPhotoUrl() != null) ? this.getCurrentUser().getPhotoUrl().toString() : null;
-            EmployeeHelper.createEmployee(uid, name, mail, urlPicture, null, null,null).addOnFailureListener(this.onFailureListener());
+//            EmployeeHelper.createEmployee(uid, name, mail, urlPicture).addOnFailureListener(this.onFailureListener());
+
+            Map<String, Object> docData = new HashMap<>();
+            docData.put("name", name);
+            docData.put("id", uid);
+            docData.put("urlPicture", urlPicture);
+            docData.put("mail", mail);
+            docData.put("notif", true);
+            mDb.collection("employee").document(uid).set(docData, SetOptions.merge());
         }
     }
 }
