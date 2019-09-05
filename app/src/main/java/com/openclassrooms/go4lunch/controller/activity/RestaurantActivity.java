@@ -38,7 +38,6 @@ import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.firestore.WriteBatch;
 import com.openclassrooms.go4lunch.R;
 import com.openclassrooms.go4lunch.api.EmployeeHelper;
-import com.openclassrooms.go4lunch.api.RestaurantHelper;
 import com.openclassrooms.go4lunch.model.Attendee;
 import com.openclassrooms.go4lunch.model.Employee;
 import com.openclassrooms.go4lunch.view.AttendeesAdapter;
@@ -127,14 +126,14 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
         if (v.equals(mBtnLike)) {
             if (sLikeOn) {
                 this.removeLikeInFirestore();
-                mBtnLike.setTextColor(getResources().getColor(R.color.orange));
-                mBtnLike.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_thumb_off, 0, 0);
-                sLikeOn = false;
+//                mBtnLike.setTextColor(getResources().getColor(R.color.orange));
+//                mBtnLike.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_thumb_off, 0, 0);
+//                sLikeOn = false;
             } else {
                 this.addLikeInFirestore();
-                mBtnLike.setTextColor(getResources().getColor(R.color.blue));
-                mBtnLike.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_thumb, 0, 0);
-                sLikeOn = true;
+//                mBtnLike.setTextColor(getResources().getColor(R.color.blue));
+//                mBtnLike.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_thumb, 0, 0);
+//                sLikeOn = true;
             }
         }
         if (v.equals(mBtnWeb)) {
@@ -151,12 +150,12 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
         if (v.equals(mBtnLunch)) {
             if (sLunchOn) {
                 this.removeLunchInFirestore();
-                mBtnLunch.setImageResource(R.drawable.ic_my_choice_off);
-                sLunchOn = false;
+//                mBtnLunch.setImageResource(R.drawable.ic_my_choice_off);
+//                sLunchOn = false;
             } else {
                 this.addLunchInFirestore();
-                mBtnLunch.setImageResource(R.drawable.ic_my_choice_on);
-                sLunchOn = true;
+//                mBtnLunch.setImageResource(R.drawable.ic_my_choice_on);
+//                sLunchOn = true;
             }
         }
     }
@@ -295,6 +294,9 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     Log.i(TAG, "Batched addLike done");
+                    mBtnLike.setTextColor(getResources().getColor(R.color.blue));
+                    mBtnLike.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_thumb, 0, 0);
+                    sLikeOn = true;
                 }
             });
         }
@@ -312,6 +314,9 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     Log.i(TAG, "Batched removeLike done");
+                    mBtnLike.setTextColor(getResources().getColor(R.color.orange));
+                    mBtnLike.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_thumb_off, 0, 0);
+                    sLikeOn = false;
                 }
             });
         }
@@ -341,6 +346,8 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     Log.i(TAG, "Batched addLunch done");
+                    mBtnLunch.setImageResource(R.drawable.ic_my_choice_on);
+                    sLunchOn = true;
                 }
             });
         }
@@ -362,6 +369,8 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     Log.i(TAG, "Batched removeLunch done");
+                    mBtnLunch.setImageResource(R.drawable.ic_my_choice_off);
+                    sLunchOn = false;
                 }
             });
         }

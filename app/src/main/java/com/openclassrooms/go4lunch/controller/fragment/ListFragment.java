@@ -287,7 +287,7 @@ public class ListFragment extends BaseFragment {
                 });
     }
 
-    private String getDistanceFromLastKnownLocation(Double lat, Double lng) {
+    public String getDistanceFromLastKnownLocation(Double lat, Double lng) {
         Location targetLocation = new Location("");
         targetLocation.setLatitude(lat);
         targetLocation.setLongitude(lng);

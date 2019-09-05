@@ -17,6 +17,8 @@ public class Employee {
     @Nullable
     private String lunchPlaceId;
     @Nullable
+    private String lunchDate;
+    @Nullable
     private HashMap<String, String> likedPlaces;
 
     public Employee() { }
@@ -39,12 +41,14 @@ public class Employee {
     public String getUrlPicture() {return urlPicture;}
     public String getLunchPlace() {return lunchPlace;}
     public String getLunchPlaceId() {return lunchPlaceId;}
+    public String getLunchDate() {return lunchDate;}
     public  HashMap<String, String>  getLikedPlaces() {return likedPlaces;}
 
     // --- SETTERS ---
     public void setNotif(boolean notif) {this.notif = notif;}
     public void setLunchPlace(String lunchPlace) {this.lunchPlace = lunchPlace;}
     public void setLunchPlaceId(String lunchPlaceId) {this.lunchPlaceId = lunchPlaceId;}
+    public void setLunchDate(String lunchDate) {this.lunchDate = lunchDate;}
     public void setLikedPlaces(HashMap<String, String> likedPlaces) {this.likedPlaces = likedPlaces;}
 
 }

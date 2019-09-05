@@ -14,7 +14,6 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 import com.openclassrooms.go4lunch.R;
-import com.openclassrooms.go4lunch.api.EmployeeHelper;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -39,13 +38,6 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         checkLoginAndDisplayAppropriateScreen();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
     }
 
     @Override
@@ -110,7 +102,7 @@ public class MainActivity extends BaseActivity {
     }
 
     private void showSnackBar(CoordinatorLayout coordinatorLayout, String message){
-        Snackbar.make(this.coordinatorLayout, message, Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_SHORT).show();
     }
 
     private void handleResponseAfterSignIn(int requestCode, int resultCode, Intent data){
@@ -123,38 +115,39 @@ public class MainActivity extends BaseActivity {
                 startPrincipalActivity();
             } else {
                 if (response == null) {
-                    showSnackBar(this.coordinatorLayout, getString(R.string.error_authentication_canceled));
+                    showSnackBar(coordinatorLayout, getString(R.string.error_authentication_canceled));
                     System.out.println("Connection canceled");
                 } else if (response.getError().getErrorCode() == ErrorCodes.NO_NETWORK) {
                     System.out.println("Connection refused. No network");
 
-                    showSnackBar(this.coordinatorLayout, getString(R.string.error_no_internet));
+                    showSnackBar(coordinatorLayout, getString(R.string.error_no_internet));
                 } else if (response.getError().getErrorCode() == ErrorCodes.UNKNOWN_ERROR) {
                     System.out.println("Connection refused. Unknown error.");
-                    showSnackBar(this.coordinatorLayout, getString(R.string.error_unknown_error));
+                    showSnackBar(coordinatorLayout, getString(R.string.error_unknown_error));
                 } else {
                     System.out.println("Connection refused. Undefined error.");
-                    showSnackBar(this.coordinatorLayout, getString(R.string.error_undefined_error));
+                    showSnackBar(coordinatorLayout, getString(R.string.error_undefined_error));
                 }
             }
         }
     }
 
     private void createUserInFirestore(){
+
         if (this.getCurrentUser() != null){
             String uid = this.getCurrentUser().getUid();
             String name = this.getCurrentUser().getDisplayName();
             String mail = this.getCurrentUser().getEmail();
             String urlPicture = (this.getCurrentUser().getPhotoUrl() != null) ? this.getCurrentUser().getPhotoUrl().toString() : null;
-//            EmployeeHelper.createEmployee(uid, name, mail, urlPicture).addOnFailureListener(this.onFailureListener());
 
             Map<String, Object> docData = new HashMap<>();
             docData.put("name", name);
-            docData.put("id", uid);
+            docData.put("uid", uid);
             docData.put("urlPicture", urlPicture);
             docData.put("mail", mail);
             docData.put("notif", true);
-            mDb.collection("employee").document(uid).set(docData, SetOptions.merge());
+
+            mDb.collection("employees").document(uid).set(docData, SetOptions.merge());
         }
     }
 }

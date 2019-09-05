@@ -317,7 +317,7 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Goo
 //                                                Log.d(TAG, "Current data: " + snapshot.getData());
                                                 Restaurant restaurant = snapshot.toObject(Restaurant.class);
                                                 assert restaurant != null;
-                                                if (restaurant.getLunchAttendees() > 0) iconName = "ic_markers_restaurant_green";
+                                                if (restaurant.getLunchAttendees() != null && restaurant.getLunchAttendees() > 0) iconName = "ic_markers_restaurant_green";
                                             } else {
 //                                                Log.d(TAG, "Current data: null");
                                             }

@@ -85,9 +85,13 @@ public abstract class BaseFragment extends Fragment {
 
         @Override
         public void afterTextChanged(Editable s) {
-            if (s.toString().equals("")) getStandardDisplay();
             mPlacesIdList.clear();
-            makeSearch(s.toString(), mLastKnownLocationBounds, mPlacesClient);
+//            System.out.println("Nouvelle lettre");
+            if (s.toString().equals("")) {
+                getStandardDisplay();
+            } else {
+                makeSearch(s.toString(), mLastKnownLocationBounds, mPlacesClient);
+            }
         }
     };
 
@@ -116,6 +120,7 @@ public abstract class BaseFragment extends Fragment {
 
             placesClient.findAutocompletePredictions(request).addOnSuccessListener((response) -> {
                 for (AutocompletePrediction prediction : response.getAutocompletePredictions()) {
+//                    System.out.println("Nouvelle liste "+prediction.getPlaceId()+"/"+prediction.getPlaceTypes());
                     if (prediction.getPlaceTypes().contains(Place.Type.RESTAURANT)) {
                         mPlacesIdList.add(prediction.getPlaceId());
                     }

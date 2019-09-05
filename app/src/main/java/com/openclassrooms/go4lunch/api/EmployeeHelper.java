@@ -41,6 +41,10 @@ public class EmployeeHelper {
         return EmployeeHelper.getEmployeesCollection().document(uid).update("lunchPlaceId", lunchPlaceId);
     }
 
+    public static Task<Void> updateLunchDate(String uid, String restaurantId, String lunchDate) {
+        return EmployeeHelper.getEmployeesCollection().document(uid).update("lunchDate", lunchDate);
+    }
+
     public static Task<Void> updateLikedPlaces(String uid, String restaurantId, String restaurantName) {
         return EmployeeHelper.getEmployeesCollection().document(uid).update("likedPlaces."+restaurantId, restaurantName);
     }

@@ -12,7 +12,6 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class FirebaseUserManagement {
     private static final int SIGN_OUT_TASK = 10;
-    private static final int DELETE_USER_TASK = 20;
 
     private static FirebaseAuth mAuth;
 
