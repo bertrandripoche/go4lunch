@@ -66,17 +66,27 @@ public class MainActivity extends BaseActivity {
         this.startSignInActivity("mail");
     }
 
+    /**
+     * This method
+     */
     private void checkLoginAndDisplayAppropriateScreen() {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         if (isCurrentUserLogged()) startPrincipalActivity();
     }
 
+    /**
+     * This method launches the PrincipalActivity
+     */
     private void startPrincipalActivity() {
         Intent intent = new Intent(MainActivity.this, PrincipalActivity.class);
         startActivity(intent);
     }
 
+    /**
+     * This method trigger the authentication process
+     * @param login is the provider the user wants to use
+     */
     private void startSignInActivity(String login){
         AuthUI.IdpConfig provider;
         if (login.equals(getResources().getString(R.string.google))) {
@@ -101,10 +111,21 @@ public class MainActivity extends BaseActivity {
                 RC_SIGN_IN);
     }
 
+    /**
+     * Method allowing to display a snackbar message
+     * @param coordinatorLayout is the element where the snackbar should be displayed
+     * @param message is the message we want to display
+     */
     private void showSnackBar(CoordinatorLayout coordinatorLayout, String message){
         Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_SHORT).show();
     }
 
+    /**
+     * This method handle the response from Firebase to authentication attempt
+     * @param requestCode is the code of the request launched
+     * @param resultCode is the result code of the request
+     * @param data is the intent representing the authentication attempt
+     */
     private void handleResponseAfterSignIn(int requestCode, int resultCode, Intent data){
         IdpResponse response = IdpResponse.fromResultIntent(data);
 
@@ -116,22 +137,20 @@ public class MainActivity extends BaseActivity {
             } else {
                 if (response == null) {
                     showSnackBar(coordinatorLayout, getString(R.string.error_authentication_canceled));
-                    System.out.println("Connection canceled");
                 } else if (response.getError().getErrorCode() == ErrorCodes.NO_NETWORK) {
-                    System.out.println("Connection refused. No network");
-
                     showSnackBar(coordinatorLayout, getString(R.string.error_no_internet));
                 } else if (response.getError().getErrorCode() == ErrorCodes.UNKNOWN_ERROR) {
-                    System.out.println("Connection refused. Unknown error.");
                     showSnackBar(coordinatorLayout, getString(R.string.error_unknown_error));
                 } else {
-                    System.out.println("Connection refused. Undefined error.");
                     showSnackBar(coordinatorLayout, getString(R.string.error_undefined_error));
                 }
             }
         }
     }
 
+    /**
+     * This method create a user entry in the Firebase database "employees" collection, only if needed (thanks to merge option)
+     */
     private void createUserInFirestore(){
 
         if (this.getCurrentUser() != null){
