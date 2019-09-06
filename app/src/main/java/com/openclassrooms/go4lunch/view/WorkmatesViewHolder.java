@@ -13,6 +13,10 @@ public class WorkmatesViewHolder extends RecyclerView.ViewHolder {
     AppCompatImageView mEmployeePic;
     TextView mEmployeeDescription;
 
+    /**
+     * This method describes a line of our RecyclerView
+     * @param itemView represents one line of the list
+     */
     public WorkmatesViewHolder(@NonNull View itemView) {
         super(itemView);
 

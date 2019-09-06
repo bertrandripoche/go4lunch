@@ -22,6 +22,25 @@ public class AttendeesAdapter extends FirestoreRecyclerAdapter<Attendee, Attende
         super(options);
     }
 
+    /**
+     * This method creates the ViewHolder
+     * @param parent is the parent view which contains the RecyclerView
+     * @param viewType
+     * @return an AttendeeViewHolder object
+     */
+    @NonNull
+    @Override
+    public AttendeesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_view_employee_item,parent,false);
+        return new AttendeesViewHolder(v);
+    }
+
+    /**
+     * This method allows to bind the data from an Attendee object on one line
+     * @param attendeesViewHolder the ViewHolder which allows to display one element of the list
+     * @param i is an int representing the position in the list
+     * @param attendee is the type of object displayed in the list
+     */
     @Override
     protected void onBindViewHolder(@NonNull AttendeesViewHolder attendeesViewHolder, int i, @NonNull Attendee attendee) {
         Resources resources = attendeesViewHolder.itemView.getContext().getResources();
@@ -48,10 +67,4 @@ public class AttendeesAdapter extends FirestoreRecyclerAdapter<Attendee, Attende
         }
     }
 
-    @NonNull
-    @Override
-    public AttendeesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_view_employee_item,parent,false);
-        return new AttendeesViewHolder(v);
-    }
 }

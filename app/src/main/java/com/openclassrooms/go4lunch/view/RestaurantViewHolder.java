@@ -29,6 +29,10 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder {
     AppCompatImageView mRestaurantRating;
     AppCompatImageView mRestaurantPhoto;
 
+    /**
+     * This method describes a line of our RecyclerView
+     * @param itemView represents one line of the list
+     */
     public RestaurantViewHolder(@NonNull View itemView) {
         super(itemView);
 

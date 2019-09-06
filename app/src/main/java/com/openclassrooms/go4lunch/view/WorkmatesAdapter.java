@@ -22,6 +22,25 @@ public class WorkmatesAdapter extends FirestoreRecyclerAdapter<Employee, Workmat
         super(options);
     }
 
+    /**
+     * This method creates the ViewHolder
+     * @param parent is the parent view which contains the RecyclerView
+     * @param viewType
+     * @return an WorkmatesViewHolder object
+     */
+    @NonNull
+    @Override
+    public WorkmatesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_view_employee_item, parent, false);
+        return new WorkmatesViewHolder(v);
+    }
+
+    /**
+     * This method allows to bind the data from an Employee object on one line
+     * @param workmatesViewHolder the ViewHolder which allows to display one element of the list
+     * @param i is an int representing the position in the list
+     * @param employee is the type of object displayed in the list
+     */
     @Override
     protected void onBindViewHolder(@NonNull WorkmatesViewHolder workmatesViewHolder, int i, @NonNull Employee employee) {
         Resources resources = workmatesViewHolder.itemView.getContext().getResources();
@@ -63,13 +82,6 @@ public class WorkmatesAdapter extends FirestoreRecyclerAdapter<Employee, Workmat
                 workmatesViewHolder.mEmployeeDescription.setTypeface(null, Typeface.ITALIC);
             }
         }
-    }
-
-    @NonNull
-    @Override
-    public WorkmatesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_view_employee_item, parent, false);
-        return new WorkmatesViewHolder(v);
     }
 
 }

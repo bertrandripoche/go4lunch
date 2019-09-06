@@ -13,11 +13,14 @@ public class AttendeesViewHolder extends RecyclerView.ViewHolder {
     AppCompatImageView mEmployeePic;
     TextView mEmployeeDescription;
 
+    /**
+     * This method describes a line of our RecyclerView
+     * @param itemView represents one line of the list
+     */
     public AttendeesViewHolder(@NonNull View itemView) {
         super(itemView);
 
         mEmployeePic = itemView.findViewById(R.id.item_employee_pic);
         mEmployeeDescription = itemView.findViewById(R.id.item_employee_description);
-
     }
 }

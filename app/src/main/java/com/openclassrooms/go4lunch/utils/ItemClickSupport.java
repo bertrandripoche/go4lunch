@@ -6,12 +6,14 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 
+/**
+ * Class used to manage the recyclerView clicks
+ */
 public class ItemClickSupport {
-    // Class used to manage the recyclerView clicks
     private final RecyclerView mRecyclerView;
     private OnItemClickListener mOnItemClickListener;
-    private OnItemLongClickListener mOnItemLongClickListener;
     private int mItemID;
+
     private View.OnClickListener mOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -19,16 +21,6 @@ public class ItemClickSupport {
                 RecyclerView.ViewHolder holder = mRecyclerView.getChildViewHolder(v);
                 mOnItemClickListener.onItemClicked(mRecyclerView, holder.getAdapterPosition(), v);
             }
-        }
-    };
-    private View.OnLongClickListener mOnLongClickListener = new View.OnLongClickListener() {
-        @Override
-        public boolean onLongClick(View v) {
-            if (mOnItemLongClickListener != null) {
-                RecyclerView.ViewHolder holder = mRecyclerView.getChildViewHolder(v);
-                return mOnItemLongClickListener.onItemLongClicked(mRecyclerView, holder.getAdapterPosition(), v);
-            }
-            return false;
         }
     };
 
@@ -41,9 +33,6 @@ public class ItemClickSupport {
             public void onChildViewAttachedToWindow(@NonNull View view) {
                 if (mOnItemClickListener != null) {
                     view.setOnClickListener(mOnClickListener);
-                }
-                if (mOnItemLongClickListener != null) {
-                    view.setOnLongClickListener(mOnLongClickListener);
                 }
             }
 
@@ -71,7 +60,4 @@ public class ItemClickSupport {
         void onItemClicked(RecyclerView recyclerView, int position, View v);
     }
 
-    public interface OnItemLongClickListener {
-        boolean onItemLongClicked(RecyclerView recyclerView, int position, View v);
-    }
 }

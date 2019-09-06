@@ -16,19 +16,33 @@ public class FirebaseUserManagement {
     private static FirebaseAuth mAuth;
 
     public FirebaseUserManagement() {
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+         mAuth = FirebaseAuth.getInstance();
     }
 
+    /**
+     * This method logout the user from Firebase
+     * @param activity is the Activity
+     */
     public void signOutUserFromFirebase(Activity activity){
         AuthUI.getInstance()
                 .signOut(activity)
                 .addOnSuccessListener(activity, this.updateUIAfterRESTRequestsCompleted(SIGN_OUT_TASK, activity));
     }
 
+    /**
+     * This method returns the current FirebaseUser
+     * @return a FirebaseUser
+     */
     @Nullable
     public static FirebaseUser getCurrentUser(){
-        return FirebaseAuth.getInstance().getCurrentUser(); }
+        return mAuth.getCurrentUser(); }
 
+    /**
+     * This method allow us to take action once we signed out from Firestore
+     * @param origin is the code for which we want to take action
+     * @param activity is the current Activity
+     * @return an OnSuccessListener object
+     */
     private OnSuccessListener<Void> updateUIAfterRESTRequestsCompleted(final int origin, Activity activity){
         return new OnSuccessListener<Void>() {
             @Override

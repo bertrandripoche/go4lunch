@@ -30,6 +30,10 @@ public class NotificationsService extends FirebaseMessagingService {
 
     String mEmployeeId = PrincipalActivity.mCurrentUser.getUid();
 
+    /**
+     * This method allows to manage the message received from FCM Firebase Cloud Messaging
+     * @param remoteMessage is the remote message sent by FCM (not used anyway)
+     */
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         if (remoteMessage.getNotification() != null) {
@@ -37,6 +41,10 @@ public class NotificationsService extends FirebaseMessagingService {
         }
     }
 
+    /**
+     * This method adapts the notification to user and trigger it if notifications are enabled for user
+     * @param id is the id of the employee
+     */
     private void prepareNotification(String id) {
         if (id != null){
             EmployeeHelper.getEmployee(id).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
@@ -53,6 +61,11 @@ public class NotificationsService extends FirebaseMessagingService {
         }
     }
 
+    /**
+     * This method create and displays the notification
+     * @param messageBody is the message to display
+     * @param placeId is the unique id of the chosen restaurant
+     */
     private void sendVisualNotification(String messageBody, String placeId) {
         PendingIntent pendingIntent = createIntent(placeId);
 
@@ -84,6 +97,11 @@ public class NotificationsService extends FirebaseMessagingService {
         notificationManager.notify(NOTIFICATION_TAG, NOTIFICATION_ID, notificationBuilder.build());
     }
 
+    /**
+     * This method creates the intent to launch the adequate Activity in case of click on the notification
+     * @param placeId is the unique id of the chosen restaurant
+     * @return a PendingIntent object, needed to create the notification
+     */
     private PendingIntent createIntent(String placeId) {
         PendingIntent pendingIntent;
         if (placeId == null) {

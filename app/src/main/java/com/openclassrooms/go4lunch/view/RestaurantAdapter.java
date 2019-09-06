@@ -30,6 +30,12 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantViewHolder
         this.mRestaurantsList = mRestaurantsList;
     }
 
+    /**
+     * This method creates the ViewHolder
+     * @param parent is the parent view which contains the RecyclerView
+     * @param viewType
+     * @returnan RestaurantViewHolder object
+     */
     @NonNull
     @Override
     public RestaurantViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -42,6 +48,11 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantViewHolder
         return new RestaurantViewHolder(v);
     }
 
+    /**
+     * This method allows to bind the data from an Attendee object on one line
+     * @param holder the ViewHolder which allows to display one element of the list
+     * @param position is an int representing the position in the list
+     */
     @Override
     public void onBindViewHolder(@NonNull RestaurantViewHolder holder, int position) {
         Restaurant restaurant = mRestaurantsList.get(position);
