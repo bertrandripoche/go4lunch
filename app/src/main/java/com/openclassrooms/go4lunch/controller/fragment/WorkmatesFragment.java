@@ -65,10 +65,17 @@ public class WorkmatesFragment extends Fragment {
         configureMenu(false);
     }
 
+    /**
+     * This method allows to hide the Search icon which is not required on this fragment
+     * @param makeVisible
+     */
     private void configureMenu(boolean makeVisible) {
         mPrincipalActivity.mSearchIcon.setVisible(makeVisible);
     }
 
+    /**
+     * This methods configures the RecyclerView
+     */
     private void configureRecyclerView() {
         Query query = mWorkmatesRef.orderBy("lunchPlace", Query.Direction.DESCENDING);
 
@@ -83,6 +90,9 @@ public class WorkmatesFragment extends Fragment {
         mRecyclerView.setAdapter(mAdapter);
     }
 
+    /**
+     * This method defines the action to do when clicking on an element from the list of employees
+     */
     void configureOnClickRecyclerView(){
         ItemClickSupport.addTo(mRecyclerView, R.layout.recycler_view_employee_item)
             .setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
@@ -106,12 +116,18 @@ public class WorkmatesFragment extends Fragment {
             });
     }
 
+    /**
+     * This method indicates when the adapter needs to start listening
+     */
     @Override
     public void onStart() {
         super.onStart();
         mAdapter.startListening();
     }
 
+    /**
+     * This method indicates when the adapter needs to stop listening
+     */
     @Override
     public void onStop() {
         super.onStop();

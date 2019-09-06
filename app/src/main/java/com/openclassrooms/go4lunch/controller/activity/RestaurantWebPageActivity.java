@@ -28,12 +28,22 @@ public class RestaurantWebPageActivity extends BaseActivity {
         mRestaurantUrl = getRestaurantUrlFromBundle();
 
         if (mRestaurantUrl != null) {
-            webView = (WebView) findViewById(R.id.webView);
-            webView.getSettings().setJavaScriptEnabled(true);
-            webView.loadUrl(mRestaurantUrl);
+            displayWebView();
         }
     }
 
+    /**
+     * This method displays the webview with the restaurant webpage
+     */
+    private void displayWebView() {
+        webView = (WebView) findViewById(R.id.webView);
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.loadUrl(mRestaurantUrl);
+    }
+
+    /**
+     * This method configures the toolbar
+     */
     private void configureToolbar(){
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -41,10 +51,18 @@ public class RestaurantWebPageActivity extends BaseActivity {
         Objects.requireNonNull(ab).setDisplayHomeAsUpEnabled(true);
     }
 
+    /**
+     * This method allows to get the bundle passed from previous activity
+     * @return the Bundle
+     */
     private Bundle getBundle() {
         return this.getIntent().getExtras();
     }
 
+    /**
+     * This method allows to get the restaurant url from the previous activity
+     * @return the url from the restaurant if any
+     */
     private String getRestaurantUrlFromBundle() {
         if (mExtras.get(RESTAURANT_URL) != null) return mExtras.get(RESTAURANT_URL).toString();
         else return null;

@@ -109,7 +109,7 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
 
     @Override
     public void onClick(View v) {
-
+        // Click on button "Call"
         if (v.equals(mBtnCall)) {
             if (mPlace.getPhoneNumber() != null) {
                 String phoneNumber = mPlace.getPhoneNumber();
@@ -121,21 +121,18 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
             } else {
                 Toast.makeText(this, R.string.no_phone_available, Toast.LENGTH_LONG).show();
             }
-
         }
+
+        // Click on button "Like"
         if (v.equals(mBtnLike)) {
             if (sLikeOn) {
                 this.removeLikeInFirestore();
-//                mBtnLike.setTextColor(getResources().getColor(R.color.orange));
-//                mBtnLike.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_thumb_off, 0, 0);
-//                sLikeOn = false;
             } else {
                 this.addLikeInFirestore();
-//                mBtnLike.setTextColor(getResources().getColor(R.color.blue));
-//                mBtnLike.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_thumb, 0, 0);
-//                sLikeOn = true;
             }
         }
+
+        // Click on button "Web"
         if (v.equals(mBtnWeb)) {
             final String RESTAURANT_URL = "restaurantUrl";
 
@@ -147,19 +144,20 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
             intent.putExtras(bundle);
             startActivity(intent);
         }
+
+        // Click on button "Lunch"
         if (v.equals(mBtnLunch)) {
             if (sLunchOn) {
                 this.removeLunchInFirestore();
-//                mBtnLunch.setImageResource(R.drawable.ic_my_choice_off);
-//                sLunchOn = false;
             } else {
                 this.addLunchInFirestore();
-//                mBtnLunch.setImageResource(R.drawable.ic_my_choice_on);
-//                sLunchOn = true;
             }
         }
     }
 
+    /**
+     * This method configure the RecyclerView which will display the lunch attendees, if any
+     */
     private void configureRecyclerView() {
         mRestaurantAttendeesRef = mDb.collection("restaurants").document(mPlaceId).collection("lunchAttendees");
         Query query = mRestaurantAttendeesRef.orderBy("name", Query.Direction.ASCENDING);
@@ -177,18 +175,27 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
         }
     }
 
+    /**
+     * This method indicates when the adapter needs to start listening
+     */
     @Override
     protected void onStart() {
         super.onStart();
         mAdapter.startListening();
     }
 
+    /**
+     * This method indicates when the adapter needs to stop listening
+     */
     @Override
     protected void onStop() {
         super.onStop();
         mAdapter.stopListening();
     }
 
+    /**
+     * This methods allows to get the current employee infos
+     */
     private void getEmployeeInfo() {
         if (this.getCurrentUser() != null){
             mEmployeeUid = this.getCurrentUser().getUid();
@@ -197,15 +204,27 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
         }
     }
 
+    /**
+     * This method allows to get the bundle passed from previous activity
+     * @return the Bundle
+     */
     private Bundle getBundle() {
         return this.getIntent().getExtras();
     }
 
+    /**
+     * This method returns the placeId from the bundle
+     * @return the placeId or null
+     */
     private String getPlaceIdFromBundle() {
         if (mExtras.get(PLACE_ID) != null) return mExtras.get(PLACE_ID).toString();
         else return null;
     }
 
+    /**
+     * This method retrieves restaurant information from his placeId thanks to Place Details Google API
+     * @param placeId is the unique String number required to get the info
+     */
     private void getPlaceInfo(String placeId) {
         List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.PHONE_NUMBER, Place.Field.WEBSITE_URI, Place.Field.ADDRESS, Place.Field.RATING, Place.Field.PHOTO_METADATAS);
 
@@ -242,6 +261,9 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
         });
     }
 
+    /**
+     * This method displays the restaurant information on the RestaurantActivity page
+     */
     private void displayRestaurant() {
         TextView restaurantName = (TextView)findViewById(R.id.restaurant_activity_name);
         String name = (mPlace == null) ? "":mPlace.getName();
@@ -268,6 +290,9 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
         }
     }
 
+    /**
+     * This method create an entry for the restaurant - if needed - in the Firestore database
+     */
     private void createRestaurantInFirestore() {
         Map<String, Object> docData = new HashMap<>();
         docData.put("name", mPlace.getName());
@@ -276,6 +301,9 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
         mDb.collection("restaurants").document(mPlaceId).set(docData, SetOptions.merge());
     }
 
+    /**
+     * This method add a like for the current restaurant from the current user in the Firestore database
+     */
     private void addLikeInFirestore(){
         if (this.getCurrentUser() != null){
 
@@ -294,14 +322,15 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     Log.i(TAG, "Batched addLike done");
-                    mBtnLike.setTextColor(getResources().getColor(R.color.blue));
-                    mBtnLike.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_thumb, 0, 0);
-                    sLikeOn = true;
+                    enableLikeButton();
                 }
             });
         }
     }
 
+    /**
+     * This method remove the like for the current restaurant from the current user in the Firestore database
+     */
     private void removeLikeInFirestore() {
         if (this.getCurrentUser() != null){
             WriteBatch batch = mDb.batch();
@@ -314,14 +343,16 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     Log.i(TAG, "Batched removeLike done");
-                    mBtnLike.setTextColor(getResources().getColor(R.color.orange));
-                    mBtnLike.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_thumb_off, 0, 0);
-                    sLikeOn = false;
+                    disableLikeButton();
                 }
             });
         }
     }
 
+    /**
+     * This method sets the lunch place for the current restaurant from the current user in the Firestore database
+     * If there was a previous lunch place defined, it's automatically deleted
+     */
     private void addLunchInFirestore(){
         if (this.getCurrentUser() != null){
             String lunchRestaurant = mPlace.getName();
@@ -346,13 +377,15 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     Log.i(TAG, "Batched addLunch done");
-                    mBtnLunch.setImageResource(R.drawable.ic_my_choice_on);
-                    sLunchOn = true;
+                    enableLunchButton();
                 }
             });
         }
     }
 
+    /**
+     * This method unsets the lunch place for the current restaurant from the current user in the Firestore database
+     */
     private void removeLunchInFirestore() {
         if (this.getCurrentUser() != null){
             WriteBatch batch = mDb.batch();
@@ -369,13 +402,15 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     Log.i(TAG, "Batched removeLunch done");
-                    mBtnLunch.setImageResource(R.drawable.ic_my_choice_off);
-                    sLunchOn = false;
+                    disableLunchButton();
                 }
             });
         }
     }
 
+    /**
+     * This method check if the current place is liked and/or set as a lunch place by the current user
+     */
     private void checkLunchAndLike() {
         if (this.getCurrentUser() != null){
             EmployeeHelper.getEmployee(mEmployeeUid).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
@@ -389,18 +424,45 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
                     mLunchPlaceToRemove = mCurrentEmployee.getLunchPlaceId();
                     HashMap<String, String> likedPlaces = mCurrentEmployee.getLikedPlaces();
 
-                    if (lunchPlace != null && lunchPlace.equals(thisRestaurant)) {
-                        mBtnLunch.setImageResource(R.drawable.ic_my_choice_on);
-                        sLunchOn = true;
-                    } else {sLunchOn = false;}
-                    if (likedPlaces != null && likedPlaces.containsKey(thisRestaurantId)) {
-                        mBtnLike.setTextColor(getResources().getColor(R.color.blue));
-                        mBtnLike.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_thumb, 0, 0);
-                        sLikeOn = true;
-                    } else {sLikeOn = false;}
+                    if (lunchPlace != null && lunchPlace.equals(thisRestaurant)) {enableLunchButton();} else {sLunchOn = false;}
+                    if (likedPlaces != null && likedPlaces.containsKey(thisRestaurantId)) {enableLikeButton();} else {sLikeOn = false;}
                 }
             });
         }
+    }
+
+    /**
+     * This method enables the lunch button
+     */
+    private void enableLunchButton() {
+        mBtnLunch.setImageResource(R.drawable.ic_my_choice_on);
+        sLunchOn = true;
+    }
+
+    /**
+     * This method disables the lunch button
+     */
+    private void disableLunchButton() {
+        mBtnLunch.setImageResource(R.drawable.ic_my_choice_off);
+        sLunchOn = false;
+    }
+
+    /**
+     * This method enables the like button
+     */
+    private void enableLikeButton() {
+        mBtnLike.setTextColor(getResources().getColor(R.color.blue));
+        mBtnLike.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_thumb, 0, 0);
+        sLikeOn = true;
+    }
+
+    /**
+     * This method disables the like button
+     */
+    private void disableLikeButton() {
+        mBtnLike.setTextColor(getResources().getColor(R.color.orange));
+        mBtnLike.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_thumb_off, 0, 0);
+        sLikeOn = false;
     }
 
 }

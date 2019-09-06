@@ -74,6 +74,9 @@ public abstract class BaseFragment extends Fragment {
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
+    /**
+     * This section manages the Search input field
+     */
     public TextWatcher textWatcher = new TextWatcher() {
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -86,7 +89,6 @@ public abstract class BaseFragment extends Fragment {
         @Override
         public void afterTextChanged(Editable s) {
             mPlacesIdList.clear();
-//            System.out.println("Nouvelle lettre");
             if (s.toString().equals("")) {
                 getStandardDisplay();
             } else {
@@ -95,6 +97,11 @@ public abstract class BaseFragment extends Fragment {
         }
     };
 
+    /**
+     * This method calculate and return the RectangularBounds needed to define the region where to search for the Autocomplete Google API
+     * @param coordinates indicates the original coordinates of the current user location
+     * @return a RectangularBounds
+     */
     protected RectangularBounds getBound(LatLng coordinates) {
         double latStart = coordinates.latitude - 0.005;
         double latStop = coordinates.latitude + 0.005;
@@ -106,6 +113,12 @@ public abstract class BaseFragment extends Fragment {
                 new LatLng(latStop, lngStop));
     }
 
+    /**
+     * This method searches, from the user query, for all the PlaceId which are restaurants and display them
+     * @param query is the string of characters entered by the user
+     * @param bounds is the RectangleBounds object - a rectangle on the map - which define where the API should search for restaurant
+     * @param placesClient is the object on which the Autocomplete API is going to work
+     */
     protected void makeSearch(String query, RectangularBounds bounds, PlacesClient placesClient) {
         if (bounds != null) {
             AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
@@ -120,7 +133,6 @@ public abstract class BaseFragment extends Fragment {
 
             placesClient.findAutocompletePredictions(request).addOnSuccessListener((response) -> {
                 for (AutocompletePrediction prediction : response.getAutocompletePredictions()) {
-//                    System.out.println("Nouvelle liste "+prediction.getPlaceId()+"/"+prediction.getPlaceTypes());
                     if (prediction.getPlaceTypes().contains(Place.Type.RESTAURANT)) {
                         mPlacesIdList.add(prediction.getPlaceId());
                     }
@@ -135,6 +147,10 @@ public abstract class BaseFragment extends Fragment {
         }
     }
 
+    /**
+     * This method create a Restaurant from a placeId thanks to Place Details Google API, ready to be displayed then in the specialized fragments
+     * @param placeId is the unique reference of the place
+     */
     protected void makeRestaurantFromPlaceId(String placeId) {
         List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.PHONE_NUMBER, Place.Field.WEBSITE_URI, Place.Field.ADDRESS, Place.Field.RATING, Place.Field.PHOTO_METADATAS);
         FetchPlaceRequest request = FetchPlaceRequest.newInstance(placeId, placeFields);

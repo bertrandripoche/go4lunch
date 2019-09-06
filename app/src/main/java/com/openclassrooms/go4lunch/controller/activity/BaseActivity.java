@@ -14,18 +14,17 @@ import com.openclassrooms.go4lunch.R;
 
 public class BaseActivity extends AppCompatActivity {
 
-    protected OnFailureListener onFailureListener(){
-        return new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(getApplicationContext(), getString(R.string.error_unknown_error), Toast.LENGTH_LONG).show();
-            }
-        };
-    }
-
+    /**
+     * This method returns the current logged user
+     * @return a FirebaseUser object representing the logged user
+     */
     @Nullable
     protected FirebaseUser getCurrentUser(){ return FirebaseAuth.getInstance().getCurrentUser(); }
 
+    /**
+     * This method allows to know if a user is logged
+     * @return true if there is a logged user
+     */
     protected Boolean isCurrentUserLogged(){ return (this.getCurrentUser() != null); }
 
 }

@@ -88,6 +88,9 @@ public class ListFragment extends BaseFragment {
         return view;
     }
 
+    /**
+     * This method displays the list of PlaceId retrieved during a user Search operation
+     */
     @Override
     void displayPlacesIdList() {
         mRestaurantList.clear();
@@ -100,17 +103,27 @@ public class ListFragment extends BaseFragment {
         }
     }
 
+    /**
+     * This method populates the list of restaurant to allow to display it via the RecyclerView
+     * @param restaurant is a Restaurant object which provides all the needed restaurant information
+     */
     @Override
     void displayPlace(Restaurant restaurant) {
         getPlaceInfo(restaurant.getId(), mRestaurantList);
     }
 
+    /**
+     * This method allows to display the restaurants around the user location
+     */
     @Override
     void getStandardDisplay() {
         mRestaurantList.clear();
         getDeviceLocation();
     }
 
+    /**
+     * This method configures the RecyclerView to have the restaurants displayed
+     */
     private void configureRecyclerView() {
         mRestaurantList = new ArrayList<>();
 
@@ -120,6 +133,12 @@ public class ListFragment extends BaseFragment {
         mRecyclerView.setAdapter(mAdapter);
     }
 
+    /**
+     * This method is needed to check if location permissions are granted
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String permissions[],
@@ -135,6 +154,9 @@ public class ListFragment extends BaseFragment {
         }
     }
 
+    /**
+     * This method allows us to get location permissions
+     */
     private void getLocationPermission() {
         if (ContextCompat.checkSelfPermission(getActivity().getApplicationContext(),ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -146,6 +168,9 @@ public class ListFragment extends BaseFragment {
         }
     }
 
+    /**
+     * This method allows us to get the current user location
+     */
     private void getDeviceLocation() {
         try {
             if (mLocationPermissionGranted) {
@@ -154,14 +179,13 @@ public class ListFragment extends BaseFragment {
                     @Override
                     public void onComplete(@NonNull Task<Location> task) {
                         if (task.isSuccessful()) {
-                            Log.d(TAG, "Location successful.");
                             mLastKnownLocation = task.getResult();
                             mLatLngLastKnownLocation =  new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
 
                             getRestaurants();
                             mLastKnownLocationBounds = getBound(mLatLngLastKnownLocation);
                         } else {
-                            Log.d(TAG, "Current location is null. Using defaults.");
+                            mLatLngLastKnownLocation = mDefaultLocation;
                             Log.e(TAG, "Exception: %s", task.getException());
                         }
 
@@ -173,6 +197,9 @@ public class ListFragment extends BaseFragment {
         }
     }
 
+    /**
+     * This method gets the restaurants around the last known user location
+     */
     private void getRestaurants() {
         List<Place.Field> placeFields = Arrays.asList(Place.Field.TYPES, Place.Field.ID);
 
@@ -211,6 +238,11 @@ public class ListFragment extends BaseFragment {
         }
     }
 
+    /**
+     * This method adds the restaurant specified by its id to the list of Restaurant object needed for the RecyclerView
+     * @param placeId is the unique id of the restaurant to add to the list
+     * @param restaurantList is the list of Restaurant to populate
+     */
     private void getPlaceInfo(String placeId, List<Restaurant> restaurantList) {
         List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.ADDRESS, Place.Field.RATING, Place.Field.PHOTO_METADATAS, Place.Field.OPENING_HOURS);
         FetchPlaceRequest request = FetchPlaceRequest.newInstance(placeId, placeFields);
@@ -264,6 +296,9 @@ public class ListFragment extends BaseFragment {
         });
     }
 
+    /**
+     * This method defines the action to do when clicking on an element from the list of restaurant
+     */
     void configureOnClickRecyclerView(){
         ItemClickSupport.addTo(mRecyclerView, R.layout.recycler_view_restaurant_item)
                 .setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
@@ -287,6 +322,12 @@ public class ListFragment extends BaseFragment {
                 });
     }
 
+    /**
+     * This method calculate the distance of the restaurant to the current user location
+     * @param lat is the latitude of the location
+     * @param lng is the longitude of the location
+     * @return the distance in meters
+     */
     public String getDistanceFromLastKnownLocation(Double lat, Double lng) {
         Location targetLocation = new Location("");
         targetLocation.setLatitude(lat);
@@ -296,10 +337,20 @@ public class ListFragment extends BaseFragment {
         return (int)distance + "m";
     }
 
+    /**
+     * This methods refreshes the RecyclerView
+     * @param restaurantList is the current list of Restaurants to display
+     */
     private void updateUI(List<Restaurant> restaurantList){
         mAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * This method searches if the restaurant name already exists in the restaurant list
+     * @param name is the name of the restaurant to search
+     * @param restaurantList is the restaurant list
+     * @return the Restaurant object if found
+     */
     public Restaurant findUsingEnhancedForLoop(String name, List<Restaurant> restaurantList) {
 
         for (Restaurant restaurant : restaurantList) {

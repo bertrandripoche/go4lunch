@@ -32,7 +32,6 @@ public class Employee {
     }
 
     // --- GETTERS ---
-
     public String getUid() {return uid;}
     public String getName() {return name;}
     public String getMail() {return mail;}

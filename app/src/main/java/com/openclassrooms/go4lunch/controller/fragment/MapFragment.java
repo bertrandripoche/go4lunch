@@ -93,6 +93,9 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Goo
         return v;
     }
 
+    /**
+     * This method displays the list of PlaceId retrieved during a user Search operation
+     */
     @Override
     void displayPlacesIdList() {
         if (!mPlacesIdList.isEmpty()) {
@@ -103,15 +106,22 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Goo
         }
     }
 
+    /**
+     * This method allows to display the restaurants around the user location
+     */
     @Override
     void getStandardDisplay() {
         getRestaurants();
     }
 
+    /**
+     * This method populates the list of restaurant to allow to display it via the RecyclerView
+     * @param restaurant is a Restaurant object which provides all the needed restaurant information
+     */
     @Override
-    void displayPlace(Restaurant resto) {
+    void displayPlace(Restaurant restaurant) {
 
-        DocumentReference documentRef = mDb.collection("restaurants").document(resto.getId());
+        DocumentReference documentRef = mDb.collection("restaurants").document(restaurant.getId());
         documentRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot snapshot,
@@ -131,14 +141,17 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Goo
                 }
                 mMap.addMarker(
                         new MarkerOptions()
-                                .position(new LatLng(resto.getLatLng().latitude, resto.getLatLng().longitude))
-                                .title(resto.getName())
+                                .position(new LatLng(restaurant.getLatLng().latitude, restaurant.getLatLng().longitude))
+                                .title(restaurant.getName())
                                 .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons(iconName,150,150)))
-                ).setTag(resto.getId());
+                ).setTag(restaurant.getId());
             }
         });
     }
 
+    /**
+     * Display the standard map when resumed
+     */
     @Override
     public void onResume() {
         super.onResume();
@@ -146,6 +159,10 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Goo
         getRestaurants();
     }
 
+    /**
+     * This method display the Google Map on the screen when ready
+     * @param googleMap is the GoogleMap object to display
+     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -167,12 +184,22 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Goo
         mMap.setOnMarkerClickListener(this);
     }
 
+    /**
+     * This method defines the action to take when the user clicks on the location button
+     * @return a boolean
+     */
     @Override
     public boolean onMyLocationButtonClick() {
         if (mPrincipalActivity.mSearchBar.getVisibility() == View.INVISIBLE) getRestaurants();
         return false;
     }
 
+    /**
+     * This method is needed to check if location permissions are granted
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String permissions[],
@@ -189,6 +216,25 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Goo
         updateLocationUI();
     }
 
+    /**
+     * This method allows us to get location permissions
+     */
+    private void getLocationPermission() {
+        if (ContextCompat.checkSelfPermission(getActivity().getApplicationContext(),
+                ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            mLocationPermissionGranted = true;
+        } else {
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{ACCESS_FINE_LOCATION},
+                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+        }
+    }
+
+    /**
+     * This method moves the location button into the right bottom corner
+     * @param mapView is the View on which we work
+     */
     private void moveCompassButton(View mapView) {
         try {
             assert mapView != null; // skip this if the mapView has not been set yet
@@ -208,18 +254,9 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Goo
         }
     }
 
-    private void getLocationPermission() {
-        if (ContextCompat.checkSelfPermission(getActivity().getApplicationContext(),
-                ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            mLocationPermissionGranted = true;
-        } else {
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{ACCESS_FINE_LOCATION},
-                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-        }
-    }
-
+    /**
+     * This method enables the compass / myLocation button
+     */
     private void enableMyLocation() {
         if (ContextCompat.checkSelfPermission(getContext(), ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -232,6 +269,9 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Goo
         }
     }
 
+    /**
+     * This method requests permission if not granted
+     */
     private void updateLocationUI() {
         if (mMap == null) {
             return;
@@ -249,6 +289,9 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Goo
         }
     }
 
+    /**
+     * This method gets the current user location and move camera adequately
+     */
     private void getDeviceLocation() {
         try {
             if (mLocationPermissionGranted) {
@@ -279,6 +322,9 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Goo
         }
     }
 
+    /**
+     * This method gets the restaurants around the last known user location
+     */
     public void getRestaurants() {
         List<Place.Field> placeFields = Arrays.asList(Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG, Place.Field.TYPES, Place.Field.ID);
 
@@ -348,6 +394,11 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Goo
         }
     }
 
+    /**
+     * This method opens a new activity with the restaurant information when its marker is clicked
+     * @param marker is the marker clicked
+     * @return a boolean
+     */
     @Override
     public boolean onMarkerClick(Marker marker) {
         final String PLACE_ID = "placeId";
@@ -363,6 +414,13 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Goo
         return false;
     }
 
+    /**
+     * This method get a Bitmap object to display then as marker
+     * @param iconName is the name of the icon
+     * @param width is the requested width
+     * @param height is the requested height
+     * @return a Bitmap object of the icon
+     */
     public Bitmap resizeMapIcons(String iconName,int width, int height){
         Bitmap imageBitmap = BitmapFactory.decodeResource(getResources(),getResources().getIdentifier(iconName, "drawable", getContext().getPackageName()));
         Bitmap resizedBitmap = Bitmap.createScaledBitmap(imageBitmap, width, height, false);

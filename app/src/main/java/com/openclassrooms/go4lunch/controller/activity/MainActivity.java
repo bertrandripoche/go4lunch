@@ -67,7 +67,7 @@ public class MainActivity extends BaseActivity {
     }
 
     /**
-     * This method
+     * This method check if there is a user logged and in that case, start the PrincipalActivity
      */
     private void checkLoginAndDisplayAppropriateScreen() {
         setContentView(R.layout.activity_main);

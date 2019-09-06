@@ -43,7 +43,6 @@ public class WorkmatesAdapter extends FirestoreRecyclerAdapter<Employee, Workmat
         String employeeDescription;
 
         if (employee.getLunchPlace() != null && !employee.getLunchPlace().equals("")) {
-            System.out.println("CurrentUser uid :"+currentUser+" - Employee uid :"+employee.getUid());
             employeeDescription = (isCurrentUser) ? resources.getString(R.string.you_eat_at) + " \"" + employee.getLunchPlace() + "\"" : firstName + resources.getString(R.string.eats_at) + " \"" + employee.getLunchPlace() + "\"";
             workmatesViewHolder.mEmployeeDescription.setText(employeeDescription);
             workmatesViewHolder.mEmployeeDescription.setTag(employee.getLunchPlaceId());
