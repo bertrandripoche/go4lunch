@@ -71,7 +71,6 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
     private static boolean sLikeOn = false;
     private static boolean sLunchOn = false;
     private Employee mCurrentEmployee;
-    private List<Employee> mEmployeeList;
 
     private FirebaseFirestore mDb = FirebaseFirestore.getInstance();
     private CollectionReference mRestaurantAttendeesRef;
@@ -278,20 +277,24 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
         if (4 <= mPlace.getRating() && mPlace.getRating() < 4.5) stars.setImageResource(R.drawable.ic_star_2);
         if (4.5 <= mPlace.getRating()) stars.setImageResource(R.drawable.ic_star_3);
 
-        if (mPlace.getPhoneNumber() == null) {
-            mBtnCall.setEnabled(false);
-            mBtnCall.setTextColor(getResources().getColor(R.color.light_grey));
-            mBtnCall.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_call_off, 0, 0);
-        }
-        if (mPlace.getWebsiteUri() == null) {
-            mBtnWeb.setEnabled(false);
-            mBtnWeb.setTextColor(getResources().getColor(R.color.light_grey));
-            mBtnWeb.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_web_off, 0, 0);
-        }
+        if (mPlace.getPhoneNumber() == null) disableBtn(mBtnCall, "ic_call_off");
+        if (mPlace.getWebsiteUri() == null) disableBtn(mBtnWeb, "ic_web_off");
     }
 
     /**
-     * This method create an entry for the restaurant - if needed - in the Firestore database
+     * This method allows to make a button appears disabled
+     * @param btn is the Button requiring to be disabled
+     * @param icon is the icon attached to the button
+     */
+    private void disableBtn(Button btn, String icon) {
+        btn.setEnabled(false);
+        btn.setTextColor(getResources().getColor(R.color.light_grey));
+        int iconId = getResources().getIdentifier(icon, "drawable", getPackageName());
+        btn.setCompoundDrawablesWithIntrinsicBounds(0, iconId, 0, 0);
+    }
+
+    /**
+     * This method creates an entry for the restaurant - if needed - in the Firestore database
      */
     private void createRestaurantInFirestore() {
         Map<String, Object> docData = new HashMap<>();
@@ -302,7 +305,7 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
     }
 
     /**
-     * This method add a like for the current restaurant from the current user in the Firestore database
+     * This method adds a like for the current restaurant from the current user in the Firestore database
      */
     private void addLikeInFirestore(){
         if (this.getCurrentUser() != null){
@@ -329,7 +332,7 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
     }
 
     /**
-     * This method remove the like for the current restaurant from the current user in the Firestore database
+     * This method removes the like for the current restaurant from the current user in the Firestore database
      */
     private void removeLikeInFirestore() {
         if (this.getCurrentUser() != null){
@@ -409,7 +412,7 @@ public class RestaurantActivity extends BaseActivity implements View.OnClickList
     }
 
     /**
-     * This method check if the current place is liked and/or set as a lunch place by the current user
+     * This method checks if the current place is liked and/or set as a lunch place by the current user
      */
     private void checkLunchAndLike() {
         if (this.getCurrentUser() != null){
