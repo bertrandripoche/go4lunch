@@ -306,17 +306,17 @@ public class ListFragment extends BaseFragment {
                     public void onItemClicked(RecyclerView recyclerView, int position, View v) {
                         final String PLACE_ID = "placeId";
                         mRestaurantName = v.findViewById(R.id.item_restaurant_name);
-                        String lunchPlaceId = (String) mRestaurantName.getTag();
+                        String restaurantId = (String) mRestaurantName.getTag();
 
-                        if (lunchPlaceId != null && lunchPlaceId != "null") {
+                        if (restaurantId != null && restaurantId != "null") {
                             Bundle bundle = new Bundle();
-                            bundle.putString(PLACE_ID, lunchPlaceId);
+                            bundle.putString(PLACE_ID, restaurantId);
 
                             Intent intent = new Intent(v.getContext(), RestaurantActivity.class);
                             intent.putExtras(bundle);
                             startActivity(intent);
                         } else {
-                            Toast.makeText(v.getContext(),R.string.no_lunch_defined,Toast.LENGTH_LONG).show();
+                            Toast.makeText(v.getContext(),R.string.no_restaurant_found,Toast.LENGTH_LONG).show();
                         }
                     }
                 });

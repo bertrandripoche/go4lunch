@@ -22,7 +22,6 @@
         <string name="logout_google">Déconnexion</string>
         <string name="title_activity_maps">Carte</string>
 
-        <!-- TODO: Remove or change this placeholder text -->
         <string name="search">Recherche</string>
         <string name="toolbar_title_map">J\'ai faim !</string>
         <string name="toolbar_title_list">J\'ai faim !</string>
@@ -57,5 +56,6 @@
         <string name="default_notification_channel_id">1</string>
         <string name="enable_notifications">Activer les notifications</string>
         <string name="disable_notifications">Désactiver les notifications</string>
+        <string name="no_restaurant_found">Aucun restaurant trouvé</string>
 
 </resources>
