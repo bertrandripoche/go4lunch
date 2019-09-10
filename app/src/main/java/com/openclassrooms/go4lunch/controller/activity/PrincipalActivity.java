@@ -63,7 +63,7 @@ public class PrincipalActivity extends BaseActivity implements NavigationView.On
     }
 
     /**
-     * This method configure the bottom navigation bar
+     * This method configures the bottom navigation bar
      */
     void configureBottomNavigationMenu() {
         BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.navbar);
@@ -165,7 +165,7 @@ public class PrincipalActivity extends BaseActivity implements NavigationView.On
     }
 
     /**
-     * This method override the onBackPressed method to change the behavior of the Back button
+     * This method overrides the onBackPressed method to change the behavior of the Back button
      */
     @Override
     public void onBackPressed() {
@@ -177,7 +177,7 @@ public class PrincipalActivity extends BaseActivity implements NavigationView.On
     }
 
     /**
-     * This method create the single icon Search menu on the toolbar
+     * This method creates the single icon Search menu on the toolbar
      * @param menu is the menu to create
      * @return true
      */
@@ -219,7 +219,7 @@ public class PrincipalActivity extends BaseActivity implements NavigationView.On
     }
 
     /**
-     * This method configure the lateral navigation menu
+     * This method configures the lateral navigation menu
      */
     private void configureNavigationView(){
         navigationView = findViewById(R.id.activity_main_nav_view);
@@ -251,7 +251,7 @@ public class PrincipalActivity extends BaseActivity implements NavigationView.On
     }
 
     /**
-     * This method close the Search field
+     * This method closes the Search field
      */
     private void closeSearch() {
         mMySearch.setText(null);

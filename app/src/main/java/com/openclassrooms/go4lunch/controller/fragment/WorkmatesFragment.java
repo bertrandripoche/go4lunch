@@ -74,7 +74,7 @@ public class WorkmatesFragment extends Fragment {
      * This methods configures the RecyclerView
      */
     private void configureRecyclerView() {
-        Query query = mWorkmatesRef.orderBy("lunchPlace", Query.Direction.DESCENDING);
+        Query query = mWorkmatesRef.orderBy("name", Query.Direction.ASCENDING);
 
         FirestoreRecyclerOptions<Employee> options = new FirestoreRecyclerOptions.Builder<Employee>()
                 .setQuery(query, Employee.class)

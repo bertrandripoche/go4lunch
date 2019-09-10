@@ -18,15 +18,12 @@ public class ListFragmentTest {
 
     @Test
     public void gettingDistanceShouldReturn250m() throws Exception {
-        ListFragment listFragment = new ListFragment();
-
-//        String distance = listFragment.getDistanceFromLastKnownLocation(48.869902,2.352717);
+        ListFragment listFragment = mock(ListFragment.class);
 
         Location lastKnownLocation = mock(Location.class);
 //        lastKnownLocation.setLatitude(48.878473);
 //        lastKnownLocation.setLongitude(2.353904d);
 
-        when(listFragment.mDb).thenReturn(null);
         when(FirebaseFirestore.getInstance()).thenReturn(null);
         when(lastKnownLocation.getLatitude()).thenReturn(48.878473d);
         when(lastKnownLocation.getLongitude()).thenReturn(2.353904d);

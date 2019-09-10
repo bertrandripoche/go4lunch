@@ -69,7 +69,6 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Goo
 
     public static MapFragment newInstance() {
         MapFragment fragment = new MapFragment();
-        Bundle args = new Bundle();
         return fragment;
     }
 
@@ -224,6 +223,7 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Goo
                 ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mLocationPermissionGranted = true;
+            mMap.setMyLocationEnabled(true);
         } else {
             ActivityCompat.requestPermissions(getActivity(),
                     new String[]{ACCESS_FINE_LOCATION},

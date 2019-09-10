@@ -28,7 +28,7 @@ public class NotificationsService extends FirebaseMessagingService {
     private final String NOTIFICATION_TAG = "FIREBASE_NOTIF";
     final String PLACE_ID = "placeId";
 
-    String mEmployeeId = PrincipalActivity.mCurrentUser.getUid();
+    String mEmployeeId = (PrincipalActivity.mCurrentUser == null) ? null: PrincipalActivity.mCurrentUser.getUid();
 
     /**
      * This method allows to manage the message received from FCM Firebase Cloud Messaging
