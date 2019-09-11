@@ -54,7 +54,7 @@
     <string name="you_did_not_decide_yet">You didn\'t decide yet.</string>
     <string name="you_eat_at">You eat at</string>
     <string name="you_eat_here">You eat here.</string>
-    <string name="search_restaurant">Search restaurant…</string>
+    <string name="search_restaurant">Search restaurant… (2 char. min.)</string>
     <string name="notification_title">G4L : your lunch place today</string>
     <string name="default_notification_channel_id">1</string>
     <string name="enable_notifications">Enable notifications</string>

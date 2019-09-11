@@ -71,16 +71,15 @@ public class PrincipalActivity extends BaseActivity implements NavigationView.On
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 Fragment fragment;
+                closeSearch();
                 switch (item.getItemId()) {
                     case R.id.nav_map:
                         mToolbar.setTitle(R.string.toolbar_title_map);
-                        closeSearch();
                         fragment = new MapFragment();
                         loadFragment(fragment);
                         break;
                     case R.id.nav_list:
                         mToolbar.setTitle(R.string.toolbar_title_list);
-                        closeSearch();
                         fragment = new ListFragment();
                         loadFragment(fragment);
                         break;

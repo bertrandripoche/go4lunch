@@ -88,11 +88,15 @@ public abstract class BaseFragment extends Fragment {
 
         @Override
         public void afterTextChanged(Editable s) {
-            mPlacesIdList.clear();
-            if (s.toString().equals("")) {
-                getStandardDisplay();
+            if (s.toString().length() > 1) {
+                mPlacesIdList.clear();
+                if (s.toString().equals("")) {
+                    getStandardDisplay();
+                } else {
+                    makeSearch(s.toString(), mLastKnownLocationBounds, mPlacesClient);
+                }
             } else {
-                makeSearch(s.toString(), mLastKnownLocationBounds, mPlacesClient);
+                getStandardDisplay();
             }
         }
     };
