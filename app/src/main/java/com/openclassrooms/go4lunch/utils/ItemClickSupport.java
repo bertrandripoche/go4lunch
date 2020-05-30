@@ -1,6 +1,5 @@
 package com.openclassrooms.go4lunch.utils;
 
-import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 

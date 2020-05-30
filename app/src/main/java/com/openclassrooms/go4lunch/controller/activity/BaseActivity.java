@@ -1,16 +1,10 @@
 package com.openclassrooms.go4lunch.controller.activity;
 
-import android.widget.Toast;
-
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.openclassrooms.go4lunch.R;
-
 
 public class BaseActivity extends AppCompatActivity {
 

@@ -8,6 +8,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.junit.Assert.*;
@@ -19,6 +20,8 @@ public class ListFragmentTest {
 
     ListFragment fragment;
 
+    @Mock BaseFragment baseFragment;
+
     @Before
     public void setUp() throws Exception {
         fragment = new ListFragment();
@@ -26,14 +29,14 @@ public class ListFragmentTest {
 
     @Test
     public void gettingDistanceShouldReturn250m() throws Exception {
-        ListFragment listFragment = mock(ListFragment.class);
+        //ListFragment listFragment = mock(ListFragment.class);
 
-        Location lastKnownLocation = new Location("");
+        Location lastKnownLocation = mock(Location.class);
 
         when(FirebaseFirestore.getInstance()).thenReturn(null);
         when(lastKnownLocation.getLatitude()).thenReturn(48.878473d);
         when(lastKnownLocation.getLongitude()).thenReturn(2.353904d);
 
-        assertEquals("250m", listFragment.getDistanceFromLastKnownLocation(48.869902,2.352717));
+        assertEquals("250m", fragment.getDistanceFromLastKnownLocation(48.869902,2.352717));
     }
 }

@@ -131,12 +131,12 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Goo
                 }
                 String iconName = "ic_markers_restaurant_red";
                 if (snapshot != null && snapshot.exists()) {
-//                                                Log.d(TAG, "Current data: " + snapshot.getData());
+//                  Log.d(TAG, "Current data: " + snapshot.getData());
                     Restaurant restaurant = snapshot.toObject(Restaurant.class);
                     assert restaurant != null;
                     if (restaurant.getLunchAttendees() != null && restaurant.getLunchAttendees() > 0) iconName = "ic_markers_restaurant_green";
                 } else {
-//                                                Log.d(TAG, "Current data: null");
+//                  Log.d(TAG, "Current data: null");
                 }
                 mMap.addMarker(
                         new MarkerOptions()
@@ -212,6 +212,7 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Goo
                 }
             }
         }
+
         updateLocationUI();
     }
 
@@ -360,12 +361,12 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Goo
                                             }
                                             String iconName = "ic_markers_restaurant_red";
                                             if (snapshot != null && snapshot.exists()) {
-//                                                Log.d(TAG, "Current data: " + snapshot.getData());
+                                                Log.d(TAG, "Current data: " + snapshot.getData());
                                                 Restaurant restaurant = snapshot.toObject(Restaurant.class);
                                                 assert restaurant != null;
                                                 if (restaurant.getLunchAttendees() != null && restaurant.getLunchAttendees() > 0) iconName = "ic_markers_restaurant_green";
                                             } else {
-//                                                Log.d(TAG, "Current data: null");
+                                                Log.d(TAG, "Current data: null");
                                             }
                                             if (mLikelyPlaceLatLngs != null) {
                                                 mMap.addMarker(
