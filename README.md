@@ -10,7 +10,6 @@ Its goal is to allow you to tell your colleagues where you go to eat at noon.<br
 
 <h1>Motivation</h1>
 This app was part of the mandatory app to realize to achieve the training.<br/>
-First app of the training.
 
 <h1>Features</h1>
 Allows to record loans and expected deliveries.<br/>
